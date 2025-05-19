@@ -15,7 +15,7 @@ export default function Home() {
       </Text>
       <div className="mt-8">
         <Button variant="default" size="lg">
-          <Link href="/tab">Who Pays?</Link>
+          <Link href="/tab">Open a new Tab</Link>
         </Button>
       </div>
     </>
