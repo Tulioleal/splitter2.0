@@ -7,8 +7,7 @@ const Heading = ({children, ...props}:HeadingProps):JSX.Element => {
     <h1
       className="text-4xl font-bold text-gray-800"
       {...props}
-    >
-      {children}
+    > {children}
     </h1>
   );
 }
