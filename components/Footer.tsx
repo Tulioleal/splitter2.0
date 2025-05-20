@@ -5,10 +5,18 @@ const Footer = () => {
         &copy; {new Date().getFullYear()} Splitter. All rights reserved.
       </span>
       <div className="flex gap-4">
-        <a href="#" className="hover:text-white transition-colors">Privacy</a>
-        <a href="#" className="hover:text-white transition-colors">Terms</a>
-        <a href="#" className="hover:text-white transition-colors">Contact</a>
-        <a href="#" className="hover:text-white transition-colors">GitHub</a>
+        <a href="#" className="hover:text-white transition-colors">
+          Privacy
+        </a>
+        <a href="#" className="hover:text-white transition-colors">
+          Terms
+        </a>
+        <a href="#" className="hover:text-white transition-colors">
+          Contact
+        </a>
+        <a href="#" className="hover:text-white transition-colors">
+          GitHub
+        </a>
       </div>
     </footer>
   );

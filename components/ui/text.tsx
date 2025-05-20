@@ -1,15 +1,17 @@
 import { JSX } from "react";
 
-type TextProps = React.HTMLProps<HTMLParagraphElement>
+type TextProps = React.HTMLProps<HTMLParagraphElement>;
 
-const Text = ({children, ...props}:TextProps):JSX.Element => {
+const Text = ({ children, className, ...props }: TextProps): JSX.Element => {
   return (
     <p
-      className="text-sm text-muted-foreground sm:text-base md:text-lg lg:text-xl"
+      className={`text-sm text-muted-foreground sm:text-base md:text-lg lg:text-xl ${className}`}
       {...props}
-    > {children}
+    >
+      {" "}
+      {children}
     </p>
   );
-}
+};
 
 export default Text;

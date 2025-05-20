@@ -7,9 +7,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <>
-      <Heading>
-        Welcome to Splitter
-      </Heading>
+      <Heading>Welcome to Splitter</Heading>
       <Text>
         A simple straightforward way to split bills with friends and family.
       </Text>
