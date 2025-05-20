@@ -1,42 +1,38 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Nav from "../components/Nav";
-import Footer from "@/components/Footer";
-import { Toaster } from "sonner";
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import './globals.css'
+import Nav from '../components/Nav'
+import Footer from '@/components/Footer'
+import { Toaster } from 'sonner'
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-sans',
+  subsets: ['latin']
+})
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+  variable: '--font-geist-mono',
+  subsets: ['latin']
+})
 
 export const metadata: Metadata = {
-  title: "Splitter",
-  description: "A smarter way to split bills",
-};
+  title: 'Splitter',
+  description: 'A smarter way to split bills'
+}
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Nav />
-        <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">
-          {children}
-        </main>
+        <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">{children}</main>
         <Footer />
         <Toaster />
       </body>
     </html>
-  );
+  )
 }

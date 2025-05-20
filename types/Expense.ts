@@ -1,8 +1,8 @@
-import { Basic } from "./Basic";
+import { Basic } from './Basic'
 
 export interface Expense extends Basic {
-  name: string;
-  amount: number;
-  paidBy: string;
-  splitBetween: number;
+  name: string
+  amount: number
+  paidBy: string
+  splitBetween: number
 }

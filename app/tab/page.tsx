@@ -1,7 +1,7 @@
-import TabScreen from "@/screens/Tab.screen";
+import TabScreen from '@/screens/Tab.screen'
 
 const TabPage = () => {
-  return <TabScreen />;
-};
+  return <TabScreen />
+}
 
-export default TabPage;
+export default TabPage

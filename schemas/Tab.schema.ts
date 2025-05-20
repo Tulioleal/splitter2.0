@@ -1,9 +1,6 @@
-import zod from "zod";
+import zod from 'zod'
 
 export const tabSchema = zod.object({
-  name: zod
-    .string()
-    .min(1, "Name is required")
-    .max(50, "Name must be less than 100 characters"),
-  currency: zod.string().length(3, "Currency must be 3 characters"),
-});
+  name: zod.string().min(1, 'Name is required').max(50, 'Name must be less than 100 characters'),
+  currency: zod.string().length(3, 'Currency must be 3 characters')
+})
