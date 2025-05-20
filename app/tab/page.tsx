@@ -1,14 +1,7 @@
-import Expenses from "@/components/Expenses/Expenses";
-import TabForm from "@/components/TabForm";
+import TabScreen from "@/screens/Tab.screen";
 
-const Tab = () => {
-  return (
-    <>
-      <h1>Tab</h1>
-      <TabForm />
-      <Expenses />
-    </>
-  );
-}
+const TabPage = () => {
+  return <TabScreen />;
+};
 
-export default Tab;
+export default TabPage;
