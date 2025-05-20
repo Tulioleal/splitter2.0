@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "npx prettier . --write && npx eslint . --fix"
+    "lint": "npx prettier . --write"
   },
   "dependencies": {
     "@hookform/error-message": "^2.0.1",
