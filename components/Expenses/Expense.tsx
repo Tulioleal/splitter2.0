@@ -1,30 +1,27 @@
 import { Expense as ExpenseType } from "@/types/Expense";
 import { JSX } from "react";
-import Text from "../ui/text";
-import { Button } from "../ui/button";
+import { useTab } from "@/context/Tab.context";
+import { TableCell } from "../ui/table";
 
 const Expense = ({
   name,
-  amount,
+  splitBetween,
   paidBy,
-  splitBetween
-}:ExpenseType):JSX.Element => {
+  amount,
+}: ExpenseType): JSX.Element => {
+  const { activeTab } = useTab();
   return (
-    <div className="flex flex-row justify-between gap-2 p-4 border border-gray-300 rounded-md mt-2">
-      <Text>
-        <span className="font-bold">{name}</span> - {amount} - {paidBy} -{" "}
-        {splitBetween}
-      </Text>
-      <div className="flex flex-row gap-2">
-        <Button>
-          delete
-        </Button>
-        <Button>
-          edit
-        </Button>
-      </div>
-    </div>
+    <>
+      <TableCell className="font-medium text-center">{name}</TableCell>
+      <TableCell className="text-center">{paidBy}</TableCell>
+      <TableCell className="text-center">
+        {splitBetween} {splitBetween > 1 ? "people" : "person"}
+      </TableCell>
+      <TableCell className="text-center">
+        {amount} {activeTab.currency}
+      </TableCell>
+    </>
   );
-}
+};
 
 export default Expense;

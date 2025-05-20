@@ -1,80 +1,112 @@
-"use client"
+"use client";
 
-import { Expense as ExpenseType } from "@/types/Expense";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { z } from "zod";
-import { expenseSchema } from "@/schemas/Expense";
+import { expenseSchema } from "@/schemas/Expense.schema";
 import Expense from "./Expense";
-import { Separator } from "../ui/separator";
+import { useTab } from "@/context/Tab.context";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
 
-type ExpenseForm = z.infer<typeof expenseSchema>
+type ExpenseForm = z.infer<typeof expenseSchema>;
 
 const Expenses = () => {
-  const [expenses, setExpenses] = useState<ExpenseType[]>([]);
+  const { activeTab, setActiveTab } = useTab();
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
-  } = useForm<ExpenseForm>()
-  
+    formState: { errors },
+  } = useForm<ExpenseForm>({
+    resolver: zodResolver(expenseSchema),
+  });
+
+  const getTotal = useMemo((): number => {
+    if (!activeTab.expenses) return 0;
+    return parseFloat(
+      activeTab.expenses
+        .reduce((curr, next) => curr + next.amount, 0)
+        .toFixed(2),
+    );
+  }, [activeTab.expenses]);
+
+  const getTotalPeople = useMemo((): number => {
+    if (!activeTab.expenses) return 0;
+    return parseFloat(
+      activeTab.expenses
+        .reduce((curr, next) => curr + next.splitBetween, 0)
+        .toFixed(2),
+    );
+  }, [activeTab.expenses]);
+
   function onSubmit(data: ExpenseForm) {
     console.log(data);
     // Add the expense to the list of expenses
-    setExpenses([
-      ...expenses,
-      {
-        ...data,
-        id: crypto.randomUUID(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-    ])
-    console.log("Expenses: ", expenses);
-    reset()
+    setActiveTab({
+      ...activeTab,
+      expenses: [
+        ...(activeTab?.expenses || []),
+        {
+          ...data,
+          id: crypto.randomUUID(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+    });
+    reset();
   }
-  
+
   useEffect(() => {
     if (errors.name) {
       toast.error("Error on Name field", {
-        description: "Name is required and must be less than 50 characters",
+        description: errors.name.message,
         duration: 5000,
       });
-      return
+      return;
     }
 
     if (errors.amount) {
       toast.error("Error on Amount field", {
-        description: "Amount must be a positive number",
+        description: errors.amount.message,
         duration: 5000,
       });
-      return
+      return;
     }
 
     if (errors.paidBy) {
       toast.error("Error on Paid By field", {
-        description: "Paid by is required and must be less than 50 characters",
+        description: errors.paidBy.message || "This field is required",
         duration: 5000,
       });
-      return
+      return;
     }
 
     if (errors.splitBetween) {
       toast.error("Error on Split Between field", {
-        description: "Split between must be a positive number",
+        description: errors.splitBetween.message,
         duration: 5000,
       });
-      return
+      return;
     }
   }, [errors]);
 
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-row gap-4 mb-4">
+    <div className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-row gap-4">
         <Input
           {...register("name")}
           type="text"
@@ -82,7 +114,7 @@ const Expenses = () => {
           aria-invalid={errors.name ? "true" : "false"}
         />
         <Input
-          {...register("paidBy", { required: true})}
+          {...register("paidBy", { required: true })}
           type="text"
           placeholder="Who paid?"
           aria-invalid={errors.paidBy ? "true" : "false"}
@@ -92,27 +124,63 @@ const Expenses = () => {
           type="number"
           placeholder="How many people?"
           aria-invalid={errors.splitBetween ? "true" : "false"}
+          required
+          min={1}
+          max={20}
         />
         <Input
           {...register("amount", { required: true, valueAsNumber: true })}
           type="number"
           placeholder="What was the amount?"
           aria-invalid={errors.amount ? "true" : "false"}
+          required
         />
         <Button type="submit">Add</Button>
       </form>
-      <Separator />
-      {
-        <ul>
-          {expenses.map((expense, index) => (
-            <li key={index}>
-              <Expense {...expense}/>
-            </li>
-          ))}
-        </ul>
-      }
+      {activeTab.expenses && (
+        <Table>
+          <TableCaption>List of all the expenses</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-center">Name</TableHead>
+              <TableHead className="text-center">Paid by</TableHead>
+              <TableHead className="text-center">Between</TableHead>
+              <TableHead className="text-center">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {activeTab.expenses.map((expense, key) => (
+              <TableRow key={key}>
+                <Expense {...expense} />
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell className="font-bold text-center">Total</TableCell>
+              <TableCell colSpan={1} />
+              <TableCell className="font-bold text-center">
+                {getTotalPeople} {getTotalPeople > 1 ? `people` : "person"}
+              </TableCell>
+              <TableCell className="font-bold text-center">
+                {getTotal.toFixed(2)} {`${activeTab.currency}`}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-bold text-center">
+                Total each
+              </TableCell>
+              <TableCell colSpan={2} />
+              <TableCell className="font-bold text-center">
+                {(getTotal / getTotalPeople).toFixed(2)}{" "}
+                {`${activeTab.currency}`}
+              </TableCell>
+            </TableRow>
+          </TableFooter>
+        </Table>
+      )}
     </div>
   );
-}
+};
 
 export default Expenses;
