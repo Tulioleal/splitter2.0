@@ -2,33 +2,44 @@
 
 import Expenses from '@/components/Expenses/Expenses'
 import NameAndCurrency from '@/components/NameAndCurrency'
-import { Button } from '@/components/ui/button'
 import Heading from '@/components/ui/heading'
+import { Stepper } from '@/components/ui/stepper'
 import { TabProvider, useTab } from '@/context/Tab.context'
-import { Tab } from '@/types/Tab'
-import { toast } from 'sonner'
+import { JSX, useMemo, useState } from 'react'
+
+interface StepInterface {
+  title: string
+  component: () => JSX.Element
+  canMoveForward: boolean
+}
 
 const TabScreenContent = () => {
+  const [currentStep, setCurrentStep] = useState<number>(0)
   const { activeTab } = useTab()
 
-  const processTab = (tab: Partial<Tab> | null) => {
-    if (!tab) {
-      toast.error('No tab data available to process', {
-        description: 'Please fill out the tab form before processing.',
-        duration: 5000
-      })
-      return
-    }
+  const STEPS: StepInterface[] = useMemo(
+    () => [
+      {
+        title: 'Name & currency',
+        component: NameAndCurrency,
+        canMoveForward: Boolean(activeTab.name && activeTab.currency)
+      },
+      {
+        title: 'Expenses',
+        component: Expenses,
+        canMoveForward: Boolean(activeTab.expenses && activeTab.expenses?.length > 0)
+      }
+    ],
+    [activeTab]
+  )
 
-    // Process the tab data here
-    console.log('Processing tab:', tab)
-  }
+  const { component: Step, canMoveForward } = useMemo(() => STEPS[currentStep], [currentStep, STEPS])
 
   return (
     <div className="flex flex-col gap-4">
-      <NameAndCurrency />
-      <Expenses />
-      <Button onClick={() => processTab(activeTab)}>Save and process</Button>
+      <Stepper steps={STEPS} currentStep={currentStep} onStepChange={setCurrentStep} canMoveForward={canMoveForward}>
+        <Step />
+      </Stepper>
     </div>
   )
 }

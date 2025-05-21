@@ -1,106 +1,65 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, SubmitHandler } from 'react-hook-form'
 import { Input } from './ui/input'
-import { Button } from './ui/button'
-import { toast } from 'sonner'
-import { useEffect } from 'react'
 import { tabSchema } from '@/schemas/Tab.schema'
-import { z } from 'zod'
 import { useTab } from '@/context/Tab.context'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import CURRENCY from '@/lib/currency'
-import { Form, FormControl, FormField, FormItem, FormMessage } from './ui/form'
+import { SelectGroup, SelectLabel } from '@radix-ui/react-select'
+import { useDebouncedCallback } from 'use-debounce'
+import { toast } from 'sonner'
+import { useEffect } from 'react'
 
-type TabFormType = z.infer<typeof tabSchema>
+// type TabFormType = z.infer<typeof tabSchema>
 
 const NameAndCurrencyForm = () => {
   const { activeTab, setActiveTab } = useTab()
-  const form = useForm<TabFormType>({
-    resolver: zodResolver(tabSchema),
-    defaultValues: {
-      name: '',
-      currency: ''
-    }
-  })
 
-  const onSubmit: SubmitHandler<TabFormType> = (data) => {
-    toast.success('Event has been created')
+  const setName = useDebouncedCallback((name: string) => {
+    setActiveTab({ ...activeTab, name })
+  }, 500)
 
-    setActiveTab({
-      ...activeTab,
-      ...data
-    })
-
-    console.log(data, activeTab)
-    // TODO: move to next Slide
+  const setCurrency = (currency: string) => {
+    setActiveTab({ ...activeTab, currency })
   }
 
   useEffect(() => {
-    if (form.formState.errors.name) {
-      toast.error('Error on Name field', {
-        description: form.formState.errors.name.message,
-        duration: 5000
-      })
-      return
-    }
+    if (activeTab.name === undefined || activeTab.currency === undefined) return
 
-    if (form.formState.errors.currency) {
-      toast.error('Error on Currency field', {
-        description: form.formState.errors.currency.message,
-        duration: 5000
-      })
+    const { name, currency } = activeTab
+    const result = tabSchema.safeParse({ name, currency })
+
+    if (!result.success) {
+      const errorMessage = result.error.issues.map((issue) => issue.message).join(', ')
+      toast.error(errorMessage)
       return
     }
-  }, [form.formState.errors])
+  }, [activeTab])
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-row gap-4 justify-between">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input
-                  {...field}
-                  className="min-w-100"
-                  placeholder="Name for the Tab"
-                  aria-invalid={form.formState.errors.name ? 'true' : 'false'}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="currency"
-          render={({ field }) => (
-            <FormItem>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a currency" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {Object.entries(CURRENCY).map((currency) => (
-                    <SelectItem key={currency[0]} value={currency[0]}>
-                      {currency[1]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Send</Button>
-      </form>
-    </Form>
+    <form className="flex flex-row gap-4 justify-between">
+      <Input
+        className="min-w-100"
+        placeholder="Name for the Tab"
+        defaultValue={activeTab.name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <Select onValueChange={(value) => setCurrency(value)} defaultValue={activeTab.currency}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Currency</SelectLabel>
+            {Object.entries(CURRENCY).map((currency) => (
+              <SelectItem key={currency[0]} value={currency[0]}>
+                {currency[1]}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </form>
   )
 }
 
