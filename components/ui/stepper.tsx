@@ -19,9 +19,9 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStep, onStepChange, can
             variant="ghost"
             key={step.title}
             type="button"
-            className={`flex flex-row items-center px-2 focus:outline-none ${
-              idx === currentStep ? 'text-black font-bold' : 'text-gray-400'
-            }`}
+            className={`flex flex-row items-center px-2 focus:outline-none
+              ${idx === currentStep ? 'text-black font-bold' : 'text-gray-400'}
+            `}
             onClick={() => onStepChange && onStepChange(idx)}
             disabled={!canMoveForward && idx > currentStep}
           >
@@ -37,21 +37,19 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStep, onStepChange, can
         ))}
       </div>
       <Separator className="my-4" />
-      <div>{children}</div>
+      <div className="w-full min-h-[100px]">{children}</div>
       <div className="flex justify-between mt-4">
         <Button
-          variant="ghost"
           type="button"
           onClick={() => onStepChange && onStepChange(currentStep - 1)}
-          disabled={currentStep === 0}
+          className={`${currentStep === 0 ? 'opacity-0 cursor-not-allowed' : ''} transition-opacity duration-400`}
         >
-          Previous
+          Previous {}
         </Button>
         <Button
-          variant="ghost"
           type="button"
           onClick={() => onStepChange && canMoveForward && onStepChange(currentStep + 1)}
-          disabled={currentStep === steps.length - 1 || !canMoveForward}
+          disabled={!canMoveForward}
         >
           Next
         </Button>
