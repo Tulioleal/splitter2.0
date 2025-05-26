@@ -54,14 +54,6 @@ const Expenses = () => {
   }
 
   useEffect(() => {
-    if (errors.name) {
-      toast.error('Error on Name field', {
-        description: errors.name.message,
-        duration: 5000
-      })
-      return
-    }
-
     if (errors.amount) {
       toast.error('Error on Amount field', {
         description: errors.amount.message,
@@ -91,12 +83,6 @@ const Expenses = () => {
     <div className="flex flex-col gap-4">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-row gap-4">
         <Input
-          {...register('name')}
-          type="text"
-          placeholder="Name for the Expense"
-          aria-invalid={errors.name ? 'true' : 'false'}
-        />
-        <Input
           {...register('paidBy', { required: true })}
           type="text"
           placeholder="Who paid?"
@@ -120,12 +106,11 @@ const Expenses = () => {
         />
         <Button type="submit">Add</Button>
       </form>
-      {activeTab.expenses && (
+      {activeTab.expenses ? (
         <Table>
           <TableCaption>List of all the expenses</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-center">Name</TableHead>
               <TableHead className="text-center">Paid by</TableHead>
               <TableHead className="text-center">Between</TableHead>
               <TableHead className="text-center">Amount</TableHead>
@@ -141,7 +126,6 @@ const Expenses = () => {
           <TableFooter>
             <TableRow>
               <TableCell className="font-bold text-center">Total</TableCell>
-              <TableCell colSpan={1} />
               <TableCell className="font-bold text-center">
                 {getTotalPeople} {getTotalPeople > 1 ? `people` : 'person'}
               </TableCell>
@@ -151,13 +135,15 @@ const Expenses = () => {
             </TableRow>
             <TableRow>
               <TableCell className="font-bold text-center">Total each</TableCell>
-              <TableCell colSpan={2} />
+              <TableCell />
               <TableCell className="font-bold text-center">
                 {(getTotal / getTotalPeople).toFixed(2)} {`${activeTab.currency}`}
               </TableCell>
             </TableRow>
           </TableFooter>
         </Table>
+      ) : (
+        <div className="text-center text-gray-500">No expenses added yet.</div>
       )}
     </div>
   )
