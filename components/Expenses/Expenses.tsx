@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '../ui/input'

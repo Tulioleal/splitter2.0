@@ -1,5 +1,3 @@
-'use client'
-
 import { Input } from './ui/input'
 import { tabSchema } from '@/schemas/Tab.schema'
 import { useTab } from '@/context/Tab.context'
