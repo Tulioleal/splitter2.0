@@ -2,6 +2,7 @@
 
 import Expenses from '@/components/Expenses/Expenses'
 import NameAndCurrency from '@/components/NameAndCurrency'
+import Transactions from '@/components/Transactions/Transactions'
 import Heading from '@/components/ui/heading'
 import { Stepper } from '@/components/ui/stepper'
 import { TabProvider, useTab } from '@/context/Tab.context'
@@ -20,14 +21,19 @@ const TabScreenContent = () => {
   const STEPS: StepInterface[] = useMemo(
     () => [
       {
-        title: 'Name & currency',
+        title: 'Setup',
         component: NameAndCurrency,
         canMoveForward: Boolean(activeTab.name && activeTab.currency)
       },
       {
-        title: 'Expenses',
+        title: 'What Was Spent?',
         component: Expenses,
         canMoveForward: Boolean(activeTab.expenses && activeTab.expenses?.length > 0)
+      },
+      {
+        title: 'Even Things Out',
+        component: Transactions,
+        canMoveForward: false
       }
     ],
     [activeTab]
@@ -45,10 +51,12 @@ const TabScreenContent = () => {
 }
 
 const TabScreen = () => (
-  <TabProvider>
+  <>
     <Heading className="mb-4">Tab</Heading>
-    <TabScreenContent />
-  </TabProvider>
+    <TabProvider>
+      <TabScreenContent />
+    </TabProvider>
+  </>
 )
 
 export default TabScreen
