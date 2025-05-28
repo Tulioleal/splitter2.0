@@ -1,22 +1,89 @@
 import { Action } from "@/types/Action";
-import { Expense } from "@/types/Expense";
+import { ExpenseOBC } from "@/types/Expense";
+import getObjectWithBasic from "./getObjectWithBasic";
 
-export const getActions = (expenses: Expense[]): Action[] => {
-  return expenses.flatMap((expense) => {
-    const { amount, paidBy, splitBetween } = expense;
-    const splitAmount = amount / splitBetween;
+/**
+ * Calculates the optimal money transfer actions to settle expenses between multiple people.
+ * 
+ * This function takes a list of expenses and determines who owes money to whom by:
+ * 1. Calculating each person's total share of expenses based on their participation
+ * 2. Computing the average expense per person across all transactions
+ * 3. Determining net balances (creditors vs debtors)
+ * 4. Generating minimal transfer actions to settle all debts
+ * 
+ * @param expenses - Array of expense objects containing amount and list of people to split between
+ * @returns Array of Action objects representing money transfers needed to settle all expenses
+ * 
+ * @example
+ * ```typescript
+ * const expenses = [
+ *   { amount: 100, splitBetween: ['alice', 'bob'] },
+ *   { amount: 60, splitBetween: ['bob', 'charlie'] }
+ * ];
+ * const actions = getActions(expenses);
+ * // Returns actions like [{ from: 'alice', to: 'bob', amount: 20 }]
+ * ```
+ * 
+ * @remarks
+ * - Person names are normalized to lowercase for consistency
+ * - Balances below 0.01 are considered negligible and ignored
+ * - The algorithm minimizes the number of transactions needed
+ * - All monetary amounts are rounded to 2 decimal places
+ */
 
-    return Array.from({ length: splitBetween }, (_, index) => {
-      const to = index === 0 ? paidBy : `User${index + 1}`; // Assuming users are named User1, User2, etc.
-      const from = index === 0 ? `User${index + 1}` : paidBy; // The first user pays, others owe
+export function getActions(expenses: ExpenseOBC[]): Action[] {
+  const balances: Record<string, number> = {};
+  const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0);
+  const totalPeople = expenses.reduce((acc, expense) => acc + expense.splitBetween.length, 0);
+  const averageExpense = totalExpenses / totalPeople;
 
-      return {
-        id: `${expense.id}-${index}`, // Unique ID for each action
-        from,
-        to,
-        amount: splitAmount,
-      } as Action;
-    });
+  for (const expense of expenses) {
+    const { amount, splitBetween } = expense;
+    const share = amount / splitBetween.length;
+
+    for (const person of splitBetween) {
+      const lowerCasePerson = person.toLowerCase();
+      if (!Boolean(balances[lowerCasePerson])) {
+        balances[lowerCasePerson] = 0;
+      }
+      balances[lowerCasePerson] = share - averageExpense;
+    }
   }
-  );
+
+  const creditors: { name: string; balance: number }[] = [];
+  const debtors: { name: string; balance: number }[] = [];
+
+  for (const [name, balance] of Object.entries(balances)) {
+    if (balance > 0.01) {
+      creditors.push({ name, balance });
+    } else if (balance < -0.01) {
+      debtors.push({ name, balance: -balance });
+    }
+  }
+
+  const actions: Action[] = [];
+
+  let i = 0;
+  let j = 0;
+
+  while (i < debtors.length && j < creditors.length) {
+    const debtor = debtors[i];
+    const creditor = creditors[j];
+
+    const amount = Math.min(debtor.balance, creditor.balance);
+
+    actions.push(getObjectWithBasic({
+      from: debtor.name,
+      to: creditor.name,
+      amount: parseFloat(amount.toFixed(2)),
+    }));
+
+    debtor.balance -= amount;
+    creditor.balance -= amount;
+
+    if (debtor.balance < 0.01) i++;
+    if (creditor.balance < 0.01) j++;
+  }
+
+  return actions;
 }
