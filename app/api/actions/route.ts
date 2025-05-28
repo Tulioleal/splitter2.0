@@ -1,4 +1,3 @@
-// app/api/tab/route.ts
 import { getActions } from '@/lib/getActions';
 import { NextRequest, NextResponse } from 'next/server';
 
