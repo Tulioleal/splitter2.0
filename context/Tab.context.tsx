@@ -2,6 +2,7 @@
 
 import { Tab } from '@/types/Tab'
 import React, { createContext, useContext, useState, ReactNode } from 'react'
+import ReactQueryProvider from './Query.provider'
 
 type TabContextType = {
   activeTab: Partial<Tab>
@@ -14,12 +15,18 @@ export const TabProvider = ({ children }: { children: ReactNode }) => {
   const [activeTab, setActiveTab] = useState<Partial<Tab>>({
     id: undefined,
     name: undefined,
+    currency: 'ARS',
     createdAt: undefined,
     updatedAt: undefined,
-    expenses: undefined
+    expenses: undefined,
+    actions: []
   })
 
-  return <TabContext.Provider value={{ activeTab, setActiveTab }}>{children}</TabContext.Provider>
+  return (
+    <TabContext.Provider value={{ activeTab, setActiveTab }}>
+      <ReactQueryProvider>{children}</ReactQueryProvider>
+    </TabContext.Provider>
+  )
 }
 
 export const useTab = (): TabContextType => {
