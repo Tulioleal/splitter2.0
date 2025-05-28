@@ -3,13 +3,13 @@ import { JSX } from 'react'
 import { useTab } from '@/context/Tab.context'
 import { TableCell } from '../ui/table'
 
-const Expense = ({ splitBetween, paidBy, amount }: ExpenseType): JSX.Element => {
+const Expense = ({ splitBetween, name, amount }: ExpenseType): JSX.Element => {
   const { activeTab } = useTab()
   return (
     <>
-      <TableCell className="text-center">{paidBy}</TableCell>
+      <TableCell className="text-center">{name}</TableCell>
       <TableCell className="text-center">
-        {splitBetween} {splitBetween > 1 ? 'people' : 'person'}
+        {splitBetween.map((name, i) => name + (i < splitBetween.length - 1 ? ', ' : '.'))}
       </TableCell>
       <TableCell className="text-center">
         {amount} {activeTab.currency}
