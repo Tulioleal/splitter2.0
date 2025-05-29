@@ -8,6 +8,7 @@ export interface TabOBC {
   totalAmount: number
   expenses: Expense[]
   actions: Action[]
+  closed: boolean
 }
 
 export type Tab = TabOBC & Basic
