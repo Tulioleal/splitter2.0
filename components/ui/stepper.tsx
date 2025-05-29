@@ -37,22 +37,21 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStep, onStepChange, can
         ))}
       </div>
       <Separator className="my-4" />
-      <div className="w-full min-h-[200px] flex flex-col justify-center">{children}</div>
+      <div className="w-full min-h-[200px] flex flex-col justify-center children">{children}</div>
       <div className="flex justify-between mt-4">
         <Button
           type="button"
           onClick={() => onStepChange && onStepChange(currentStep - 1)}
           className={`${currentStep === 0 ? 'opacity-0 cursor-not-allowed' : ''} transition-opacity duration-400`}
         >
-          Previous {}
+          Previous
         </Button>
         <Button
           type="button"
           onClick={() => onStepChange && canMoveForward && onStepChange(currentStep + 1)}
-          className={`${currentStep === steps.length - 1 ? 'opacity-0 cursor-not-allowed' : ''} transition-opacity duration-400`}
-          disabled={!canMoveForward && currentStep < steps.length - 1}
+          className={`transition-opacity duration-400`}
         >
-          Next
+          {currentStep === steps.length - 1 ? 'Close tab' : 'Next'}
         </Button>
       </div>
     </div>
