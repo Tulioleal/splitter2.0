@@ -11,13 +11,11 @@ const Transaction = ({ id, amount, from, to, checked }: TransactionProps): JSX.E
   const { activeTab, setActiveTab } = useTab()
 
   const toggleChecked = () => {
-    setIsPaid(!isPaid)
-
     // find the corresponding expense
     const action = activeTab.actions?.find((action) => action.id === id)
 
     if (action) {
-      // Update the action with the new checked state
+      setIsPaid(!isPaid)
       const newActions = activeTab.actions?.map((a) => {
         if (a.id === id) {
           return { ...a, checked: !isPaid }
