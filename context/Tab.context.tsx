@@ -12,15 +12,11 @@ type TabContextType = {
 const TabContext = createContext<TabContextType | undefined>(undefined)
 
 export const TabProvider = ({ children }: { children: ReactNode }) => {
-  const [activeTab, setActiveTab] = useState<Partial<Tab>>({
-    id: undefined,
-    name: undefined,
-    currency: 'ARS',
-    createdAt: undefined,
-    updatedAt: undefined,
-    expenses: undefined,
-    actions: []
-  })
+  const [activeTab, setActiveTab] = useState<Partial<Tab>>({})
+
+  // useEffect(() => {
+  //   return () => {}
+  // }, []) // for when we need to save things on indexedDB on every change
 
   return (
     <TabContext.Provider value={{ activeTab, setActiveTab }}>
