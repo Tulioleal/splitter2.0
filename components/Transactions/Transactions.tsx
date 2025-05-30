@@ -4,22 +4,31 @@ import { Action } from '@/types/Action'
 import { useQuery } from '@tanstack/react-query'
 import Spinner from '../ui/spinner'
 import Transaction from './Transaction'
+import { useState } from 'react'
 
 const Transactions = () => {
   const { activeTab, setActiveTab } = useTab()
+  const [actions, setActions] = useState<Action[]>([])
+  const fetchActionsExists = activeTab.actions && activeTab.actions.length > 0
+  const fetchActions = () =>
+    Boolean(fetchActionsExists)
+      ? Promise.resolve(activeTab.actions || []).then((data) => {
+          setActions(data)
+          return data
+        })
+      : fetchFromAPI<Action[]>({ expenses: activeTab.expenses }, 'actions', 'POST').then((data) => {
+          setActiveTab({
+            ...activeTab,
+            actions: data
+          })
+          setActions(data)
+          return data
+        })
 
   // Queries
   const { data, error, isLoading } = useQuery({
     queryKey: ['actions'],
-    queryFn: () =>
-      fetchFromAPI<Action[]>({ expenses: activeTab.expenses }, 'actions', 'POST').then((data) => {
-        setActiveTab({
-          ...activeTab,
-          actions: data || []
-        })
-
-        return data || []
-      })
+    queryFn: fetchActions
   })
 
   if (isLoading) return <Spinner size="md" />
@@ -27,9 +36,7 @@ const Transactions = () => {
 
   return (
     <div className="flex flex-col gap-4 py-4 rounded-lg max-h-[calc(100vh-200px)] overflow-y-auto">
-      {data.map((action) => (
-        <Transaction key={action.id} {...action} />
-      ))}
+      {actions?.map((action) => <Transaction key={action.id} {...action} />)}
     </div>
   )
 }
