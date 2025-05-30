@@ -1,6 +1,7 @@
 import { Action } from "@/types/Action";
 import { ExpenseOBC } from "@/types/Expense";
 import getObjectWithBasic from "./getObjectWithBasic";
+import { getCleanSet } from "./getCleanSet";
 
 /**
  * Calculates the optimal money transfer actions to settle expenses between multiple people.
@@ -34,20 +35,30 @@ import getObjectWithBasic from "./getObjectWithBasic";
 export function getActions(expenses: ExpenseOBC[]): Action[] {
   const balances: Record<string, number> = {};
   const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0);
-  const totalPeople = expenses.reduce((acc, expense) => acc + expense.splitBetween.length, 0);
+  const totalPeople = getCleanSet(
+    expenses.flatMap((expense) => expense.splitBetween)
+  ).length || 1; // Ensure at least one person to avoid division by zero
   const averageExpense = totalExpenses / totalPeople;
 
   for (const expense of expenses) {
     const { amount, splitBetween } = expense;
-    const share = amount / splitBetween.length;
+    const cleanSplitBetween = getCleanSet(splitBetween);
+    const share = amount / cleanSplitBetween.length;
 
-    for (const person of splitBetween) {
+    for (const person of cleanSplitBetween) {
       const lowerCasePerson = person.toLowerCase();
-      if (!Boolean(balances[lowerCasePerson])) {
+
+      if (balances[lowerCasePerson] == undefined) {
         balances[lowerCasePerson] = 0;
       }
-      balances[lowerCasePerson] = share - averageExpense;
+
+      balances[lowerCasePerson] = share + balances[lowerCasePerson];
     }
+  }
+
+  // Adjust balances to reflect how much each person owes or is owed
+  for (const person in balances) {
+    balances[person] = parseFloat((balances[person] - averageExpense).toFixed(2));
   }
 
   const creditors: { name: string; balance: number }[] = [];
@@ -76,6 +87,7 @@ export function getActions(expenses: ExpenseOBC[]): Action[] {
       from: debtor.name,
       to: creditor.name,
       amount: parseFloat(amount.toFixed(2)),
+      checked: false,
     }));
 
     debtor.balance -= amount;
