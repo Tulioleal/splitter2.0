@@ -1,7 +1,9 @@
 import { Basic } from './Basic'
 
-export interface Expense extends Basic {
+export interface ExpenseOBC {
+  name: string
   amount: number
-  paidBy: string
-  splitBetween: number
+  splitBetween: string[]
 }
+
+export type Expense = ExpenseOBC & Basic

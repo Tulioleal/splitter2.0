@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '../ui/input'
@@ -11,6 +9,8 @@ import Expense from './Expense'
 import { useTab } from '@/context/Tab.context'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '../ui/table'
+import getObjectWithBasic from '@/lib/getObjectWithBasic'
+import { getCleanSet } from '@/lib/getCleanSet'
 
 type ExpenseForm = z.infer<typeof expenseSchema>
 
@@ -32,22 +32,22 @@ const Expenses = () => {
 
   const getTotalPeople = useMemo((): number => {
     if (!activeTab.expenses) return 0
-    return parseFloat(activeTab.expenses.reduce((curr, next) => curr + next.splitBetween, 0).toFixed(2))
+    const cleanNames = getCleanSet(activeTab.expenses.flatMap((expense) => expense.splitBetween))
+    return cleanNames.length || 1 // Ensure at least one person to avoid division by zero
   }, [activeTab.expenses])
 
   function onSubmit(data: ExpenseForm) {
-    console.log(data)
     // Add the expense to the list of expenses
     setActiveTab({
       ...activeTab,
       expenses: [
         ...(activeTab?.expenses || []),
-        {
+        getObjectWithBasic({
           ...data,
           id: crypto.randomUUID(),
           createdAt: new Date(),
           updatedAt: new Date()
-        }
+        })
       ]
     })
     reset()
@@ -62,9 +62,9 @@ const Expenses = () => {
       return
     }
 
-    if (errors.paidBy) {
+    if (errors.name) {
       toast.error('Error on Paid By field', {
-        description: errors.paidBy.message || 'This field is required',
+        description: errors.name.message || 'This field is required',
         duration: 5000
       })
       return
@@ -81,21 +81,14 @@ const Expenses = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-row gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Input
-          {...register('paidBy', { required: true })}
+          {...register('name', { required: true })}
           type="text"
-          placeholder="Who paid?"
-          aria-invalid={errors.paidBy ? 'true' : 'false'}
-        />
-        <Input
-          {...register('splitBetween', { required: true, valueAsNumber: true })}
-          type="number"
-          placeholder="How many people?"
-          aria-invalid={errors.splitBetween ? 'true' : 'false'}
+          placeholder="Name the expense"
           required
-          min={1}
-          max={20}
+          aria-invalid={errors.name ? 'true' : 'false'}
+          className="col-span-2"
         />
         <Input
           {...register('amount', { required: true, valueAsNumber: true })}
@@ -103,15 +96,26 @@ const Expenses = () => {
           placeholder="What was the amount?"
           aria-invalid={errors.amount ? 'true' : 'false'}
           required
+          className="col-span-2"
+        />
+        <Input
+          {...register('splitBetween', {
+            required: true,
+            setValueAs: (value: string) => value.split(',').map((item) => item.trim())
+          })}
+          placeholder="Who split the expense? (comma separated)"
+          aria-invalid={errors.splitBetween ? 'true' : 'false'}
+          required
+          className="col-span-3"
         />
         <Button type="submit">Add</Button>
       </form>
       {activeTab.expenses ? (
-        <Table>
+        <Table className="overflow-y-scroll max-h-10 bg-gray-200">
           <TableCaption>List of all the expenses</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-center">Paid by</TableHead>
+              <TableHead className="text-center">Expense</TableHead>
               <TableHead className="text-center">Between</TableHead>
               <TableHead className="text-center">Amount</TableHead>
             </TableRow>
@@ -126,9 +130,7 @@ const Expenses = () => {
           <TableFooter>
             <TableRow>
               <TableCell className="font-bold text-center">Total</TableCell>
-              <TableCell className="font-bold text-center">
-                {getTotalPeople} {getTotalPeople > 1 ? `people` : 'person'}
-              </TableCell>
+              <TableCell className="font-bold text-center">{getTotalPeople}</TableCell>
               <TableCell className="font-bold text-center">
                 {getTotal.toFixed(2)} {`${activeTab.currency}`}
               </TableCell>

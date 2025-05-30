@@ -2,6 +2,7 @@
 
 import { Tab } from '@/types/Tab'
 import React, { createContext, useContext, useState, ReactNode } from 'react'
+import ReactQueryProvider from './Query.provider'
 
 type TabContextType = {
   activeTab: Partial<Tab>
@@ -11,15 +12,17 @@ type TabContextType = {
 const TabContext = createContext<TabContextType | undefined>(undefined)
 
 export const TabProvider = ({ children }: { children: ReactNode }) => {
-  const [activeTab, setActiveTab] = useState<Partial<Tab>>({
-    id: undefined,
-    name: undefined,
-    createdAt: undefined,
-    updatedAt: undefined,
-    expenses: undefined
-  })
+  const [activeTab, setActiveTab] = useState<Partial<Tab>>({})
 
-  return <TabContext.Provider value={{ activeTab, setActiveTab }}>{children}</TabContext.Provider>
+  // useEffect(() => {
+  //   return () => {}
+  // }, []) // for when we need to save things on indexedDB on every change
+
+  return (
+    <TabContext.Provider value={{ activeTab, setActiveTab }}>
+      <ReactQueryProvider>{children}</ReactQueryProvider>
+    </TabContext.Provider>
+  )
 }
 
 export const useTab = (): TabContextType => {
