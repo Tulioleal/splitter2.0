@@ -10,6 +10,7 @@ import { useTab } from '@/context/Tab.context'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '../ui/table'
 import getObjectWithBasic from '@/lib/getObjectWithBasic'
+import { getCleanSet } from '@/lib/getCleanSet'
 
 type ExpenseForm = z.infer<typeof expenseSchema>
 
@@ -31,7 +32,8 @@ const Expenses = () => {
 
   const getTotalPeople = useMemo((): number => {
     if (!activeTab.expenses) return 0
-    return parseFloat(activeTab.expenses.reduce((curr, next) => curr + next.splitBetween.length, 0).toFixed(2))
+    const cleanNames = getCleanSet(activeTab.expenses.flatMap((expense) => expense.splitBetween))
+    return cleanNames.length || 1 // Ensure at least one person to avoid division by zero
   }, [activeTab.expenses])
 
   function onSubmit(data: ExpenseForm) {
@@ -109,7 +111,7 @@ const Expenses = () => {
         <Button type="submit">Add</Button>
       </form>
       {activeTab.expenses ? (
-        <Table>
+        <Table className="overflow-y-scroll max-h-10 bg-gray-200">
           <TableCaption>List of all the expenses</TableCaption>
           <TableHeader>
             <TableRow>
