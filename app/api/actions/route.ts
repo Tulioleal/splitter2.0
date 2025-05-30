@@ -18,8 +18,6 @@ export async function POST(request: NextRequest) {
 
   const actions = getActions(data.expenses);
 
-  console.log(actions)
-
   // ...handle data, e.g., save to DB
   return NextResponse.json(actions);
 }
