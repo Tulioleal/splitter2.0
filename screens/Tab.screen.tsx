@@ -6,6 +6,7 @@ import Transactions from '@/components/Transactions/Transactions'
 import Heading from '@/components/ui/heading'
 import { Stepper } from '@/components/ui/stepper'
 import { TabProvider, useTab } from '@/context/Tab.context'
+import db from '@/db/db'
 import { JSX, useMemo, useState } from 'react'
 
 interface StepInterface {
@@ -33,18 +34,26 @@ const TabScreenContent = () => {
       {
         title: 'Even Things Out',
         component: Transactions,
-        canMoveForward: false
+        canMoveForward: activeTab.actions != undefined && Boolean(activeTab.actions.every((action) => action.checked)),
+        onNextSideEffect: () => {
+          db.tab.add({
+            ...activeTab,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            closed: true
+          })
+        }
       }
     ],
     [activeTab]
   )
 
-  const { component: Step, canMoveForward } = useMemo(() => STEPS[currentStep], [currentStep, STEPS])
+  const Step = useMemo(() => STEPS[currentStep], [currentStep, STEPS])
 
   return (
     <div className="flex flex-col gap-4 min-w-[720px]">
-      <Stepper steps={STEPS} currentStep={currentStep} onStepChange={setCurrentStep} canMoveForward={canMoveForward}>
-        <Step />
+      <Stepper steps={STEPS} currentStep={currentStep} onStepChange={setCurrentStep} {...Step}>
+        <Step.component />
       </Stepper>
     </div>
   )

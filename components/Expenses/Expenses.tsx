@@ -33,7 +33,7 @@ const Expenses = () => {
   const getTotalPeople = useMemo((): number => {
     if (!activeTab.expenses) return 0
     const cleanNames = getCleanSet(activeTab.expenses.flatMap((expense) => expense.splitBetween))
-    return cleanNames.length || 1 // Ensure at least one person to avoid division by zero
+    return cleanNames.length
   }, [activeTab.expenses])
 
   function onSubmit(data: ExpenseForm) {
@@ -139,7 +139,7 @@ const Expenses = () => {
               <TableCell className="font-bold text-center">Total each</TableCell>
               <TableCell />
               <TableCell className="font-bold text-center">
-                {(getTotal / getTotalPeople).toFixed(2)} {`${activeTab.currency}`}
+                {getTotalPeople != 0 ? (getTotal / getTotalPeople).toFixed(2) : 0} {`${activeTab.currency}`}
               </TableCell>
             </TableRow>
           </TableFooter>

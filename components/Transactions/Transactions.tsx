@@ -7,23 +7,20 @@ import Transaction from './Transaction'
 import { useState } from 'react'
 
 const Transactions = () => {
-  const { activeTab, setActiveTab } = useTab()
+  const { activeTab, setActiveTab, touched, isNew } = useTab()
   const [actions, setActions] = useState<Action[]>([])
-  const fetchActionsExists = activeTab.actions && activeTab.actions.length > 0
   const fetchActions = () =>
-    Boolean(fetchActionsExists)
-      ? Promise.resolve(activeTab.actions || []).then((data) => {
-          setActions(data)
-          return data
-        })
-      : fetchFromAPI<Action[]>({ expenses: activeTab.expenses }, 'actions', 'POST').then((data) => {
+    touched || isNew
+      ? fetchFromAPI<Action[]>({ expenses: activeTab.expenses }, 'actions', 'POST').then((data) => {
           setActiveTab({
             ...activeTab,
             actions: data
           })
           setActions(data)
+          console.log(touched)
           return data
         })
+      : Promise.resolve(activeTab.actions)
 
   // Queries
   const { data, error, isLoading } = useQuery({
