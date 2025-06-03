@@ -1,30 +1,31 @@
 import { Input } from './ui/input'
 import { tabSchema } from '@/schemas/Tab.schema'
-import { useTab } from '@/context/Tab.context'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import CURRENCY from '@/lib/currency'
 import { SelectGroup, SelectLabel } from '@radix-ui/react-select'
 import { useDebouncedCallback } from 'use-debounce'
 import { toast } from 'sonner'
 import { useEffect } from 'react'
+import { useTabStore } from '@/store/store'
 
 // type TabFormType = z.infer<typeof tabSchema>
 
 const NameAndCurrencyForm = () => {
-  const { activeTab, setActiveTab } = useTab()
+  const name = useTabStore((state) => state.tab.name)
+  const currency = useTabStore((state) => state.tab.currency)
+  const modTab = useTabStore((state) => state.modTab)
 
   const setName = useDebouncedCallback((name: string) => {
-    setActiveTab({ ...activeTab, name })
+    modTab({ name })
   }, 500)
 
   const setCurrency = (currency: string) => {
-    setActiveTab({ ...activeTab, currency })
+    modTab({ currency })
   }
 
   useEffect(() => {
-    if (activeTab.name === undefined || activeTab.currency === undefined) return
+    if (name === undefined || currency === undefined) return
 
-    const { name, currency } = activeTab
     const result = tabSchema.safeParse({ name, currency })
 
     if (!result.success) {
@@ -32,17 +33,17 @@ const NameAndCurrencyForm = () => {
       toast.error(errorMessage)
       return
     }
-  }, [activeTab])
+  }, [name, currency])
 
   return (
     <form className="flex flex-row gap-4 justify-between">
       <Input
         className="min-w-100"
         placeholder="Name for the Tab"
-        defaultValue={activeTab.name}
+        defaultValue={name ?? ''}
         onChange={(e) => setName(e.target.value)}
       />
-      <Select onValueChange={(value) => setCurrency(value)} defaultValue={activeTab.currency}>
+      <Select onValueChange={(value) => setCurrency(value)} defaultValue={currency ?? 'USD'}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="" />
         </SelectTrigger>
