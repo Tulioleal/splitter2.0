@@ -7,13 +7,16 @@ import { useDebouncedCallback } from 'use-debounce'
 import { toast } from 'sonner'
 import { useEffect } from 'react'
 import { useTabStore } from '@/store/store'
+import { useShallow } from 'zustand/react/shallow'
 
 const NameAndCurrencyForm = () => {
-  const { name, currency, modTab } = useTabStore((state) => ({
-    name: state.tab.name,
-    currency: state.tab.currency,
-    modTab: state.modTab
-  }))
+  const { name, currency, modTab } = useTabStore(
+    useShallow((state) => ({
+      name: state.tab.name,
+      currency: state.tab.currency,
+      modTab: state.modTab
+    }))
+  )
 
   const setName = useDebouncedCallback((name: string) => {
     modTab({ name })
