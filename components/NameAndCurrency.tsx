@@ -8,12 +8,12 @@ import { toast } from 'sonner'
 import { useEffect } from 'react'
 import { useTabStore } from '@/store/store'
 
-// type TabFormType = z.infer<typeof tabSchema>
-
 const NameAndCurrencyForm = () => {
-  const name = useTabStore((state) => state.tab.name)
-  const currency = useTabStore((state) => state.tab.currency)
-  const modTab = useTabStore((state) => state.modTab)
+  const { name, currency, modTab } = useTabStore((state) => ({
+    name: state.tab.name,
+    currency: state.tab.currency,
+    modTab: state.modTab
+  }))
 
   const setName = useDebouncedCallback((name: string) => {
     modTab({ name })
