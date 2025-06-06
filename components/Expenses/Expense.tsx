@@ -1,10 +1,11 @@
 import { Expense as ExpenseType } from '@/types/Expense'
 import { JSX } from 'react'
-import { useTab } from '@/context/Tab.context'
 import { TableCell } from '../ui/table'
+import { useTabStore } from '@/store/store'
 
 const Expense = ({ splitBetween, name, amount }: ExpenseType): JSX.Element => {
-  const { activeTab } = useTab()
+  const currency = useTabStore((state) => state.tab.currency)
+
   return (
     <>
       <TableCell className="text-center">{name}</TableCell>
@@ -12,7 +13,7 @@ const Expense = ({ splitBetween, name, amount }: ExpenseType): JSX.Element => {
         {splitBetween.map((name, i) => name + (i < splitBetween.length - 1 ? ', ' : '.'))}
       </TableCell>
       <TableCell className="text-center">
-        {amount} {activeTab.currency}
+        {amount} {currency}
       </TableCell>
     </>
   )

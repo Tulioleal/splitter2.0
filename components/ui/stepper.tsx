@@ -35,7 +35,7 @@ const Stepper: React.FC<StepperProps> = ({
               ${idx === currentStep ? 'text-black font-bold' : 'text-gray-400'}
             `}
             onClick={() => onStepChange && onStepChange(idx)}
-            disabled={!canMoveForward && idx > currentStep}
+            disabled={!canMoveForward || idx > currentStep + 1}
           >
             <div
               className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
