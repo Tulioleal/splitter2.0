@@ -27,7 +27,7 @@ const NameAndCurrencyForm = () => {
   }
 
   useEffect(() => {
-    if (name === undefined || currency === undefined) return
+    if (name === '' || currency === '') return
 
     const result = tabSchema.safeParse({ name, currency })
 
