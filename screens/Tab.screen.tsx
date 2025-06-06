@@ -5,8 +5,11 @@ import NameAndCurrency from '@/components/NameAndCurrency'
 import Transactions from '@/components/Transactions/Transactions'
 import Heading from '@/components/ui/heading'
 import { Stepper } from '@/components/ui/stepper'
-import { TabProvider, useTab } from '@/context/Tab.context'
+import ReactQueryProvider from '@/context/Query.provider'
+import { tabSchema } from '@/schemas/Tab.schema'
+import { useTabStore } from '@/store/store'
 import { JSX, useMemo, useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 
 interface StepInterface {
   title: string
@@ -16,27 +19,33 @@ interface StepInterface {
 
 const TabScreenContent = () => {
   const [currentStep, setCurrentStep] = useState<number>(0)
-  const { activeTab } = useTab()
+  const { name, currency, expenses } = useTabStore(
+    useShallow((state) => ({
+      name: state.tab.name,
+      currency: state.tab.currency,
+      expenses: state.tab.expenses
+    }))
+  )
 
   const STEPS: StepInterface[] = useMemo(
     () => [
       {
         title: 'Setup',
         component: NameAndCurrency,
-        canMoveForward: Boolean(activeTab.name && activeTab.currency)
+        canMoveForward: !Boolean(tabSchema.safeParse({ name, currency }).error)
       },
       {
         title: 'What Was Spent?',
         component: Expenses,
-        canMoveForward: Boolean(activeTab.expenses && activeTab.expenses?.length > 0)
+        canMoveForward: Boolean(expenses?.length > 0)
       },
       {
         title: 'Even Things Out',
         component: Transactions,
-        canMoveForward: false
+        canMoveForward: true
       }
     ],
-    [activeTab]
+    [name, currency, expenses]
   )
 
   const { component: Step, canMoveForward } = useMemo(() => STEPS[currentStep], [currentStep, STEPS])
@@ -53,9 +62,9 @@ const TabScreenContent = () => {
 const TabScreen = () => (
   <>
     <Heading className="mb-4">Tab</Heading>
-    <TabProvider>
+    <ReactQueryProvider>
       <TabScreenContent />
-    </TabProvider>
+    </ReactQueryProvider>
   </>
 )
 
