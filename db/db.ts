@@ -10,7 +10,7 @@ const db = new Dexie('Tabs') as Dexie & {
 
 // Schema declaration:
 db.version(1).stores({
-  tab: '++id, currency, totalAmount, closed' // primary key "id" (for the runtime!)
+  tab: '&id, currency, closed' // primary key "id" (for the runtime!)
 });
 
 export default db;

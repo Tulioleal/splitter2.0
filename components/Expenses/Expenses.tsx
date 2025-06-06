@@ -46,15 +46,7 @@ const Expenses = () => {
   function onSubmit(data: ExpenseForm) {
     // Add the expense to the list of expenses
     modTab({
-      expenses: [
-        ...(expenses || []),
-        getObjectWithBasic({
-          ...data,
-          id: crypto.randomUUID(),
-          createdAt: new Date(),
-          updatedAt: new Date()
-        })
-      ]
+      expenses: [...(expenses || []), getObjectWithBasic(data)]
     })
     reset()
   }

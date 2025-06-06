@@ -1,3 +1,4 @@
+import TabList from '@/components/TabList'
 import { Button } from '@/components/ui/button'
 import Heading from '@/components/ui/heading'
 import Text from '@/components/ui/text'
@@ -13,6 +14,10 @@ export default function Home() {
         <Button variant="default" size="lg">
           <Link href="/tab">Open a new Tab</Link>
         </Button>
+      </div>
+
+      <div className="mt-4">
+        <TabList />
       </div>
     </>
   )
