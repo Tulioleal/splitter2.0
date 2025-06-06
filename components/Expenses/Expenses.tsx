@@ -6,16 +6,23 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import { expenseSchema } from '@/schemas/Expense.schema'
 import Expense from './Expense'
-import { useTab } from '@/context/Tab.context'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '../ui/table'
 import getObjectWithBasic from '@/lib/getObjectWithBasic'
 import { getCleanSet } from '@/lib/getCleanSet'
+import { useTabStore } from '@/store/store'
+import { useShallow } from 'zustand/react/shallow'
 
 type ExpenseForm = z.infer<typeof expenseSchema>
 
 const Expenses = () => {
-  const { activeTab, setActiveTab } = useTab()
+  const { expenses, currency, modTab } = useTabStore(
+    useShallow((state) => ({
+      expenses: state.tab.expenses,
+      currency: state.tab.currency,
+      modTab: state.modTab
+    }))
+  )
   const {
     register,
     handleSubmit,
@@ -26,22 +33,21 @@ const Expenses = () => {
   })
 
   const getTotal = useMemo((): number => {
-    if (!activeTab.expenses) return 0
-    return parseFloat(activeTab.expenses.reduce((curr, next) => curr + next.amount, 0).toFixed(2))
-  }, [activeTab.expenses])
+    if (!expenses) return 0
+    return parseFloat(expenses.reduce((curr, next) => curr + next.amount, 0).toFixed(2))
+  }, [expenses])
 
   const getTotalPeople = useMemo((): number => {
-    if (!activeTab.expenses) return 0
-    const cleanNames = getCleanSet(activeTab.expenses.flatMap((expense) => expense.splitBetween))
+    if (!expenses) return 0
+    const cleanNames = getCleanSet(expenses.flatMap((expense) => expense.splitBetween))
     return cleanNames.length || 1 // Ensure at least one person to avoid division by zero
-  }, [activeTab.expenses])
+  }, [expenses])
 
   function onSubmit(data: ExpenseForm) {
     // Add the expense to the list of expenses
-    setActiveTab({
-      ...activeTab,
+    modTab({
       expenses: [
-        ...(activeTab?.expenses || []),
+        ...(expenses || []),
         getObjectWithBasic({
           ...data,
           id: crypto.randomUUID(),
@@ -110,7 +116,7 @@ const Expenses = () => {
         />
         <Button type="submit">Add</Button>
       </form>
-      {activeTab.expenses ? (
+      {expenses ? (
         <Table className="overflow-y-scroll max-h-10 bg-gray-200">
           <TableCaption>List of all the expenses</TableCaption>
           <TableHeader>
@@ -121,7 +127,7 @@ const Expenses = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {activeTab.expenses.map((expense, key) => (
+            {expenses.map((expense, key) => (
               <TableRow key={key}>
                 <Expense {...expense} />
               </TableRow>
@@ -132,14 +138,14 @@ const Expenses = () => {
               <TableCell className="font-bold text-center">Total</TableCell>
               <TableCell className="font-bold text-center">{getTotalPeople}</TableCell>
               <TableCell className="font-bold text-center">
-                {getTotal.toFixed(2)} {`${activeTab.currency}`}
+                {getTotal.toFixed(2)} {`${currency}`}
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-bold text-center">Total each</TableCell>
               <TableCell />
               <TableCell className="font-bold text-center">
-                {(getTotal / getTotalPeople).toFixed(2)} {`${activeTab.currency}`}
+                {(getTotal / getTotalPeople).toFixed(2)} {`${currency}`}
               </TableCell>
             </TableRow>
           </TableFooter>

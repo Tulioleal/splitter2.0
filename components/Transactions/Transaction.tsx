@@ -1,45 +1,47 @@
 import { Action } from '@/types/Action'
-import { JSX, useState } from 'react'
+import { JSX } from 'react'
 import Text from '../ui/text'
-import { useTab } from '@/context/Tab.context'
 import TextTransition, { presets } from 'react-text-transition'
+import { useTabStore } from '@/store/store'
+import { useShallow } from 'zustand/react/shallow'
 
 type TransactionProps = Action
 
 const Transaction = ({ id, amount, from, to, checked }: TransactionProps): JSX.Element => {
-  const [isPaid, setIsPaid] = useState<boolean>(checked || false)
-  const { activeTab, setActiveTab } = useTab()
+  const { actions, currency, modTab } = useTabStore(
+    useShallow((state) => ({
+      actions: state.tab.actions,
+      currency: state.tab.currency,
+      modTab: state.modTab
+    }))
+  )
 
   const toggleChecked = () => {
     // find the corresponding expense
-    const action = activeTab.actions?.find((action) => action.id === id)
+    const action = actions?.find((action) => action.id === id)
 
-    if (action) {
-      setIsPaid(!isPaid)
-      const newActions = activeTab.actions?.map((a) => {
-        if (a.id === id) {
-          return { ...a, checked: !isPaid }
-        }
-        return a
-      })
-      setActiveTab({
-        ...activeTab,
-        actions: newActions
-      })
-    }
+    if (!action) return
+
+    const newActions = actions?.map((a) => {
+      if (a.id !== id) return a
+      return { ...a, checked: a.checked ? false : true }
+    })
+    modTab({
+      actions: newActions
+    })
   }
 
   return (
     <div
-      className={`flex flex-row gap-2 p-4 border rounded-lg shadow-sm cursor-pointer ${isPaid ? 'bg-green-100 hover:bg-green-50 ' : 'bg-red-100 hover:bg-red-50 '} transition-colors`}
+      className={`flex flex-row gap-2 p-4 border rounded-lg shadow-sm cursor-pointer ${checked ? 'bg-green-100 hover:bg-green-50 ' : 'bg-red-100 hover:bg-red-50 '} transition-colors`}
       onClick={toggleChecked}
     >
       <Text tag="span">
         {from}{' '}
         <TextTransition inline springConfig={presets.wobbly}>
-          {isPaid ? 'paid' : 'owes'}
+          {checked ? 'paid' : 'owes'}
         </TextTransition>{' '}
-        {to} <span className="font-bold">{amount}</span> {activeTab.currency}
+        {to} <span className="font-bold">{amount}</span> {currency}
       </Text>
     </div>
   )

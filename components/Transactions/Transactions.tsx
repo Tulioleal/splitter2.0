@@ -1,27 +1,31 @@
-import { useTab } from '@/context/Tab.context'
 import fetchFromAPI from '@/lib/fetchFromAPI'
 import { Action } from '@/types/Action'
 import { useQuery } from '@tanstack/react-query'
 import Spinner from '../ui/spinner'
 import Transaction from './Transaction'
-import { useState } from 'react'
+import { useTabStore } from '@/store/store'
+import { useShallow } from 'zustand/react/shallow'
 
 const Transactions = () => {
-  const { activeTab, setActiveTab } = useTab()
-  const [actions, setActions] = useState<Action[]>([])
-  const fetchActionsExists = activeTab.actions && activeTab.actions.length > 0
+  const { actions, expenses, modTab } = useTabStore(
+    useShallow((state) => ({
+      actions: state.tab.actions,
+      expenses: state.tab.expenses,
+      modTab: state.modTab
+    }))
+  )
   const fetchActions = () =>
-    Boolean(fetchActionsExists)
-      ? Promise.resolve(activeTab.actions || []).then((data) => {
-          setActions(data)
-          return data
-        })
-      : fetchFromAPI<Action[]>({ expenses: activeTab.expenses }, 'actions', 'POST').then((data) => {
-          setActiveTab({
-            ...activeTab,
+    Boolean(actions.length > 0)
+      ? Promise.resolve(actions || []).then((data) => {
+          modTab({
             actions: data
           })
-          setActions(data)
+          return data
+        })
+      : fetchFromAPI<Action[]>({ expenses: expenses }, 'actions', 'POST').then((data) => {
+          modTab({
+            actions: data
+          })
           return data
         })
 
