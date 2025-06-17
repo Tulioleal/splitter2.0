@@ -9,7 +9,7 @@ const TabList = () => {
   const tabs = useLiveQuery(() => db.tab.toArray())
   if (!tabs)
     return (
-      <div className="flex flex-col gap-1.5 w-[300px] sm:w-[600px]">
+      <div className="flex flex-col gap-1.5 w-[320px] sm:w-[600px]">
         {Array.from({ length: 5 }).map((_, index) => (
           <Skeleton key={index} className="h-[35px] w-full rounded-md bg-gray-200" />
         ))}
@@ -17,7 +17,7 @@ const TabList = () => {
     )
 
   return (
-    <div className="flex flex-col gap-1.5 w-[300px] xs:w-[250px] sm:w-[600px]">
+    <div className="flex flex-col gap-1.5 max-h-[400px] overflow-y-auto w-[320px] xs:w-[250px] sm:w-[600px]">
       <ul>
         {tabs.map((tab) => (
           <li
@@ -25,7 +25,9 @@ const TabList = () => {
             className="p-2 border-b border-gray-200 last:border-b-0 transition-colors hover:bg-gray-200 "
           >
             <Link href={`/tab/${tab.id}`} className="flex justify-between">
-              <span className="font-medium">{tab.name}</span>
+              <span className="font-medium">
+                {tab.name} <b>{tab.closed ? 'Closed' : ''}</b>
+              </span>
               <span className="text-right">
                 {tab.totalAmount.toFixed(2)}
                 <strong> {tab.currency}</strong>
