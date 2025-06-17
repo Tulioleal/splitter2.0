@@ -86,12 +86,14 @@ const TabScreen = ({ id }: { id?: string }) => {
 
   useEffect(() => {
     if (!id || !tab) {
-      console.log('TabScreen: No ID or tab found, resetting tab state')
       resetTab()
       return
     }
 
-    modTab(tab)
+    modTab({
+      ...tab,
+      isNew: id ? false : true
+    })
   }, [modTab, resetTab, id, tab])
 
   return (
