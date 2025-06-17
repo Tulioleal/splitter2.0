@@ -43,10 +43,10 @@ const NameAndCurrencyForm = () => {
       <Input
         className="min-w-100"
         placeholder="Name for the Tab"
-        defaultValue={name ?? ''}
+        value={name ?? ''}
         onChange={(e) => setName(e.target.value)}
       />
-      <Select onValueChange={(value) => setCurrency(value)} defaultValue={currency ?? 'USD'}>
+      <Select onValueChange={(value) => setCurrency(value)} value={currency ?? 'USD'}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="" />
         </SelectTrigger>
