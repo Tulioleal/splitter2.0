@@ -20,11 +20,11 @@ const NameAndCurrencyForm = () => {
 
   const setName = useDebouncedCallback((name: string) => {
     modTab({ name })
-  }, 500)
+  }, 1000)
 
-  const setCurrency = (currency: string) => {
+  const setCurrency = useDebouncedCallback((currency: string) => {
     modTab({ currency })
-  }
+  }, 1000)
 
   useEffect(() => {
     if (name === '' || currency === '') return
