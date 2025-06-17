@@ -8,11 +8,12 @@ import { Stepper } from '@/components/ui/stepper'
 import db from '@/db/db'
 import { tabSchema } from '@/schemas/Tab.schema'
 import { useTabStore } from '@/store/store'
-import { JSX, useMemo, useState } from 'react'
+import { JSX, useEffect, useMemo, useState } from 'react'
 import getObjectWithBasic from '@/lib/getObjectWithBasic'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { GET_tab } from '@/db/tab.model'
+import { shallow } from 'zustand/shallow'
 
 interface StepInterface {
   title: string
@@ -82,6 +83,25 @@ const fetchTab = async (id: string | undefined) => {
 
 const TabScreen = ({ id }: { id?: string }) => {
   const { isLoading } = useQuery({ queryKey: [id], queryFn: fetchTab.bind(null, id) })
+
+  useEffect(() => {
+    // const sub = useTabStore.subscribe((state) => {
+    //   console.log(state)
+    // })
+
+    const sub = useTabStore.subscribe(
+      (state) => state.tab,
+      (tab) => {
+        // TODO: Handle tab updates
+      },
+      {
+        equalityFn: shallow,
+        fireImmediately: false
+      }
+    )
+
+    return sub
+  }, [])
 
   if (isLoading) {
     return <div>Loading...</div>

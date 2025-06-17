@@ -18,12 +18,8 @@ const NameAndCurrencyForm = () => {
     }))
   )
 
-  const setName = useDebouncedCallback((name: string) => {
-    modTab({ name })
-  }, 1000)
-
-  const setCurrency = useDebouncedCallback((currency: string) => {
-    modTab({ currency })
+  const setValue = useDebouncedCallback((newValue: string, key: 'name' | 'currency') => {
+    modTab({ [key]: newValue })
   }, 1000)
 
   useEffect(() => {
@@ -43,10 +39,10 @@ const NameAndCurrencyForm = () => {
       <Input
         className="min-w-100"
         placeholder="Name for the Tab"
-        value={name ?? ''}
-        onChange={(e) => setName(e.target.value)}
+        defaultValue={name}
+        onChange={(e) => setValue(e.target.value, 'name')}
       />
-      <Select onValueChange={(value) => setCurrency(value)} value={currency ?? 'USD'}>
+      <Select defaultValue={currency} onValueChange={(value) => setValue(value, 'currency')}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="" />
         </SelectTrigger>
