@@ -6,14 +6,13 @@ import Transactions from '@/components/Transactions/Transactions'
 import Heading from '@/components/ui/heading'
 import { Stepper } from '@/components/ui/stepper'
 import db from '@/db/db'
-import ReactQueryProvider from '@/context/Query.provider'
 import { tabSchema } from '@/schemas/Tab.schema'
 import { useTabStore } from '@/store/store'
-import { JSX, useEffect, useMemo, useState } from 'react'
+import { JSX, useMemo, useState } from 'react'
 import getObjectWithBasic from '@/lib/getObjectWithBasic'
 import { useRouter } from 'next/navigation'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { useShallow } from 'zustand/react/shallow'
+import { useQuery } from '@tanstack/react-query'
+import { GET_tab } from '@/db/tab.model'
 
 interface StepInterface {
   title: string
@@ -52,9 +51,7 @@ const TabScreenContent = () => {
                 closed: true
               })
             })
-            .then(() => {
-              router.push(`/`)
-            })
+            .then(() => router.push(`/`))
         }
       }
     ],
@@ -72,36 +69,28 @@ const TabScreenContent = () => {
   )
 }
 
+const fetchTab = async (id: string | undefined) => {
+  if (!id) {
+    useTabStore.getState().resetTab()
+    return useTabStore.getState().tab
+  }
+  const tab = await GET_tab(id)
+  if (!tab) return useTabStore.getState().tab
+  useTabStore.getState().modTab(tab)
+  return tab
+}
+
 const TabScreen = ({ id }: { id?: string }) => {
-  const tab = useLiveQuery(() => {
-    if (!id) return undefined
-    return db.tab.get(id)
-  }, [id])
-  const { modTab, resetTab } = useTabStore(
-    useShallow((state) => ({
-      modTab: state.modTab,
-      resetTab: state.resetTab
-    }))
-  )
+  const { isLoading } = useQuery({ queryKey: [id], queryFn: fetchTab.bind(null, id) })
 
-  useEffect(() => {
-    if (!id || !tab) {
-      resetTab()
-      return
-    }
-
-    modTab({
-      ...tab,
-      isNew: id ? false : true
-    })
-  }, [modTab, resetTab, id, tab])
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <>
       <Heading className="mb-4">Tab</Heading>
-      <ReactQueryProvider>
-        <TabScreenContent />
-      </ReactQueryProvider>
+      <TabScreenContent />
     </>
   )
 }
