@@ -42,7 +42,7 @@ const TabScreenContent = () => {
       {
         title: 'Even Things Out',
         component: Transactions,
-        canMoveForward: Boolean(tab.actions.every((action) => action.checked)),
+        canMoveForward: Boolean(tab.actions.length > 0 && tab.actions.every((action) => action.checked)),
         onNextSideEffect: () => {
           db.tab
             .add({
@@ -83,16 +83,29 @@ const fetchTab = async (id: string | undefined) => {
 
 const TabScreen = ({ id }: { id?: string }) => {
   const { isLoading } = useQuery({ queryKey: [id], queryFn: fetchTab.bind(null, id) })
-
+  const modTab = useTabStore((state) => state.modTab)
   useEffect(() => {
-    // const sub = useTabStore.subscribe((state) => {
-    //   console.log(state)
-    // })
-
     const sub = useTabStore.subscribe(
       (state) => state.tab,
       (tab) => {
-        // TODO: Handle tab updates
+        if (tab.id == '') {
+          const completeTab = getObjectWithBasic({
+            ...tab,
+            isNew: true
+          })
+          db.tab
+            .add(completeTab)
+            .then((id) => modTab({ id }))
+            .catch((error) => {
+              console.error('Error adding tab:', error)
+            })
+        }
+
+        if (tab.id != '') {
+          db.tab.put(getObjectWithBasic(tab)).catch((error) => {
+            console.error('Error updating tab:', error)
+          })
+        }
       },
       {
         equalityFn: shallow,
@@ -101,7 +114,7 @@ const TabScreen = ({ id }: { id?: string }) => {
     )
 
     return sub
-  }, [])
+  }, [modTab])
 
   if (isLoading) {
     return <div>Loading...</div>
