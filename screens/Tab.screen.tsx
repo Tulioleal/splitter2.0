@@ -5,15 +5,15 @@ import NameAndCurrency from '@/components/NameAndCurrency'
 import Transactions from '@/components/Transactions/Transactions'
 import Heading from '@/components/ui/heading'
 import { Stepper } from '@/components/ui/stepper'
-import db from '@/db/db'
 import { tabSchema } from '@/schemas/Tab.schema'
 import { useTabStore } from '@/store/store'
 import { JSX, useEffect, useMemo, useState } from 'react'
-import getObjectWithBasic from '@/lib/getObjectWithBasic'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { GET_tab } from '@/db/tab.model'
 import { shallow } from 'zustand/shallow'
+import upsertTab from '@/lib/upsertTab'
+import fetchTab from '@/lib/fetchTab'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface StepInterface {
   title: string
@@ -44,15 +44,11 @@ const TabScreenContent = () => {
         component: Transactions,
         canMoveForward: Boolean(tab.actions.length > 0 && tab.actions.every((action) => action.checked)),
         onNextSideEffect: () => {
-          db.tab
-            .add({
-              ...getObjectWithBasic({
-                ...tab,
-                totalAmount: tab.expenses.reduce((acc, expense) => acc + expense.amount, 0),
-                closed: true
-              })
-            })
+          upsertTab({ ...tab, closed: true })
             .then(() => router.push(`/`))
+            .catch((error) => {
+              console.error('Error closing tab:', error)
+            })
         }
       }
     ],
@@ -70,43 +66,13 @@ const TabScreenContent = () => {
   )
 }
 
-const fetchTab = async (id: string | undefined) => {
-  if (!id) {
-    useTabStore.getState().resetTab()
-    return useTabStore.getState().tab
-  }
-  const tab = await GET_tab(id)
-  if (!tab) return useTabStore.getState().tab
-  useTabStore.getState().modTab(tab)
-  return tab
-}
-
 const TabScreen = ({ id }: { id?: string }) => {
   const { isLoading } = useQuery({ queryKey: [id], queryFn: fetchTab.bind(null, id) })
   const modTab = useTabStore((state) => state.modTab)
   useEffect(() => {
     const sub = useTabStore.subscribe(
       (state) => state.tab,
-      (tab) => {
-        if (tab.id == '') {
-          const completeTab = getObjectWithBasic({
-            ...tab,
-            isNew: true
-          })
-          db.tab
-            .add(completeTab)
-            .then((id) => modTab({ id }))
-            .catch((error) => {
-              console.error('Error adding tab:', error)
-            })
-        }
-
-        if (tab.id != '') {
-          db.tab.put(getObjectWithBasic(tab)).catch((error) => {
-            console.error('Error updating tab:', error)
-          })
-        }
-      },
+      async (tab) => await upsertTab(tab),
       {
         equalityFn: shallow,
         fireImmediately: false
@@ -117,7 +83,16 @@ const TabScreen = ({ id }: { id?: string }) => {
   }, [modTab])
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+      <div className="flex flex-col gap-3 w-[320px] sm:w-[600px]">
+        <Skeleton className="h-[35px] w-full rounded-md bg-gray-200" />
+        <Skeleton className="h-[250px] w-full rounded-md bg-gray-200" />
+        <div className="flex flex-row gap-2 justify-between">
+          <Skeleton className="h-[35px] w-[100px] rounded-md bg-gray-200" />
+          <Skeleton className="h-[35px] w-[100px] rounded-md bg-gray-200" />
+        </div>
+      </div>
+    )
   }
 
   return (
