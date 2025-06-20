@@ -59,7 +59,7 @@ const Stepper: React.FC<StepperProps> = ({
           Previous
         </Button>
         <Button type="button" onClick={() => canMoveForward && onNext()} className={`transition-opacity duration-400`}>
-          {currentStep === steps.length - 1 ? 'Close tab' : 'Next'}
+          {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
         </Button>
       </div>
     </div>
