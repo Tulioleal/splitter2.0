@@ -7,27 +7,25 @@ import { useTabStore } from '@/store/store'
 import { useShallow } from 'zustand/react/shallow'
 
 const Transactions = () => {
-  const { actions, expenses, modTab } = useTabStore(
+  const { actions, expenses, modTab, expensesTouched } = useTabStore(
     useShallow((state) => ({
       actions: state.tab.actions,
       expenses: state.tab.expenses,
-      modTab: state.modTab
+      modTab: state.modTab,
+      expensesTouched: state.ExpensesTouched
     }))
   )
-  const fetchActions = () =>
-    Boolean(actions.length > 0)
-      ? Promise.resolve(actions || []).then((data) => {
-          modTab({
-            actions: data
-          })
-          return data
-        })
+  const fetchActions = async () => {
+    console.log(!expensesTouched, actions.length > 0)
+    return Boolean(actions.length > 0) && !expensesTouched
+      ? await Promise.resolve(actions || [])
       : fetchFromAPI<Action[]>({ expenses: expenses }, 'actions', 'POST').then((data) => {
           modTab({
             actions: data
           })
           return data
         })
+  }
 
   // Queries
   const { data, error, isLoading } = useQuery({

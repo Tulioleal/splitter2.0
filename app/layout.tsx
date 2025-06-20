@@ -4,6 +4,7 @@ import './globals.css'
 import Nav from '../components/Nav'
 import Footer from '@/components/Footer'
 import { Toaster } from 'sonner'
+import ReactQueryProvider from '@/context/Query.provider'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -29,7 +30,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Nav />
-        <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">{children}</main>
+        <ReactQueryProvider>
+          <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100">{children}</main>
+        </ReactQueryProvider>
         <Footer />
         <Toaster />
       </body>

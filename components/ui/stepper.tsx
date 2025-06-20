@@ -7,10 +7,22 @@ interface StepperProps {
   currentStep: number
   onStepChange: (step: number) => void
   canMoveForward: boolean
+  onNextSideEffect?: () => void
   children: React.ReactNode
 }
 
-const Stepper: React.FC<StepperProps> = ({ steps, currentStep, onStepChange, canMoveForward, children }) => {
+const Stepper: React.FC<StepperProps> = ({
+  steps,
+  currentStep,
+  onStepChange,
+  onNextSideEffect,
+  canMoveForward,
+  children
+}) => {
+  function onNext() {
+    if (currentStep != steps.length - 1) onStepChange(currentStep + 1)
+    if (onNextSideEffect) onNextSideEffect()
+  }
   return (
     <div className="w-full">
       <div className="flex items-center justify-evenly gap-4 mb-4">
@@ -46,12 +58,8 @@ const Stepper: React.FC<StepperProps> = ({ steps, currentStep, onStepChange, can
         >
           Previous
         </Button>
-        <Button
-          type="button"
-          onClick={() => onStepChange && canMoveForward && onStepChange(currentStep + 1)}
-          className={`transition-opacity duration-400`}
-        >
-          {currentStep === steps.length - 1 ? 'Close tab' : 'Next'}
+        <Button type="button" onClick={() => canMoveForward && onNext()} className={`transition-opacity duration-400`}>
+          {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
         </Button>
       </div>
     </div>

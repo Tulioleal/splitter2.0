@@ -5,67 +5,102 @@ import NameAndCurrency from '@/components/NameAndCurrency'
 import Transactions from '@/components/Transactions/Transactions'
 import Heading from '@/components/ui/heading'
 import { Stepper } from '@/components/ui/stepper'
-import ReactQueryProvider from '@/context/Query.provider'
 import { tabSchema } from '@/schemas/Tab.schema'
 import { useTabStore } from '@/store/store'
-import { JSX, useMemo, useState } from 'react'
-import { useShallow } from 'zustand/react/shallow'
+import { JSX, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { shallow } from 'zustand/shallow'
+import upsertTab from '@/lib/upsertTab'
+import fetchTab from '@/lib/fetchTab'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface StepInterface {
   title: string
   component: () => JSX.Element
   canMoveForward: boolean
+  onNextSideEffect?: () => void
 }
 
 const TabScreenContent = () => {
   const [currentStep, setCurrentStep] = useState<number>(0)
-  const { name, currency, expenses } = useTabStore(
-    useShallow((state) => ({
-      name: state.tab.name,
-      currency: state.tab.currency,
-      expenses: state.tab.expenses
-    }))
-  )
+  const tab = useTabStore((state) => state.tab)
+  const router = useRouter()
 
   const STEPS: StepInterface[] = useMemo(
     () => [
       {
         title: 'Setup',
         component: NameAndCurrency,
-        canMoveForward: !Boolean(tabSchema.safeParse({ name, currency }).error)
+        canMoveForward: !Boolean(tabSchema.safeParse({ name: tab.name, currency: tab.currency }).error)
       },
       {
         title: 'What Was Spent?',
         component: Expenses,
-        canMoveForward: Boolean(expenses?.length > 0)
+        canMoveForward: Boolean(tab.expenses?.length > 0)
       },
       {
         title: 'Even Things Out',
         component: Transactions,
-        canMoveForward: true
+        canMoveForward: Boolean(tab.actions.length > 0 && tab.actions.every((action) => action.checked)),
+        onNextSideEffect: () => {
+          upsertTab({ ...tab, closed: true })
+            .then(() => router.push(`/`))
+            .catch((error) => {
+              console.error('Error closing tab:', error)
+            })
+        }
       }
     ],
-    [name, currency, expenses]
+    [tab, router]
   )
 
-  const { component: Step, canMoveForward } = useMemo(() => STEPS[currentStep], [currentStep, STEPS])
+  const Step = useMemo(() => STEPS[currentStep], [currentStep, STEPS])
 
   return (
     <div className="flex flex-col gap-4 min-w-[720px]">
-      <Stepper steps={STEPS} currentStep={currentStep} onStepChange={setCurrentStep} canMoveForward={canMoveForward}>
-        <Step />
+      <Stepper steps={STEPS} currentStep={currentStep} onStepChange={setCurrentStep} {...Step}>
+        <Step.component />
       </Stepper>
     </div>
   )
 }
 
-const TabScreen = () => (
-  <>
-    <Heading className="mb-4">Tab</Heading>
-    <ReactQueryProvider>
+const TabScreen = ({ id }: { id?: string }) => {
+  const { isLoading } = useQuery({ queryKey: [id], queryFn: fetchTab.bind(null, id) })
+  const modTab = useTabStore((state) => state.modTab)
+  useEffect(() => {
+    const sub = useTabStore.subscribe(
+      (state) => state.tab,
+      async (tab) => await upsertTab(tab),
+      {
+        equalityFn: shallow,
+        fireImmediately: false
+      }
+    )
+
+    return sub
+  }, [modTab])
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-3 w-[320px] sm:w-[600px]">
+        <Skeleton className="h-[35px] w-full rounded-md bg-gray-200" />
+        <Skeleton className="h-[250px] w-full rounded-md bg-gray-200" />
+        <div className="flex flex-row gap-2 justify-between">
+          <Skeleton className="h-[35px] w-[100px] rounded-md bg-gray-200" />
+          <Skeleton className="h-[35px] w-[100px] rounded-md bg-gray-200" />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <Heading className="mb-4">Tab</Heading>
       <TabScreenContent />
-    </ReactQueryProvider>
-  </>
-)
+    </>
+  )
+}
 
 export default TabScreen

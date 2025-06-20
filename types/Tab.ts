@@ -9,6 +9,7 @@ export interface TabOBC {
   expenses: Expense[]
   actions: Action[]
   closed: boolean
+  isNew: boolean
 }
 
 export type Tab = TabOBC & Basic
