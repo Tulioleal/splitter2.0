@@ -26,16 +26,17 @@ const ExpenseTable = () => {
   }, [expenses])
 
   return (
-    <Table className="overflow-y-scroll max-h-10 bg-gray-200">
+    <Table className="bg-gray-200">
       <TableCaption>List of all the expenses</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead className="text-center">Expense</TableHead>
           <TableHead className="text-center">Between</TableHead>
           <TableHead className="text-center">Amount</TableHead>
+          <TableHead className="text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="overflow-y-auto max-h-[300px]">
         {expenses.map((expense, key) => (
           <TableRow key={key}>
             <Expense {...expense} />
@@ -49,6 +50,7 @@ const ExpenseTable = () => {
           <TableCell className="font-bold text-center">
             {getTotal.toFixed(2)} {`${currency}`}
           </TableCell>
+          <TableCell />
         </TableRow>
         <TableRow>
           <TableCell className="font-bold text-center">Total each</TableCell>
@@ -56,6 +58,7 @@ const ExpenseTable = () => {
           <TableCell className="font-bold text-center">
             {(getTotal / getTotalPeople).toFixed(2)} {`${currency}`}
           </TableCell>
+          <TableCell />
         </TableRow>
       </TableFooter>
     </Table>
