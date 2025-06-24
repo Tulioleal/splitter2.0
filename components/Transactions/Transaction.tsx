@@ -4,6 +4,7 @@ import Text from '../ui/text'
 import TextTransition, { presets } from 'react-text-transition'
 import { useTabStore } from '@/store/store'
 import { useShallow } from 'zustand/react/shallow'
+import { capitalize } from '@/lib/capitalize'
 
 type TransactionProps = Action
 
@@ -37,11 +38,11 @@ const Transaction = ({ id, amount, from, to, checked }: TransactionProps): JSX.E
       onClick={toggleChecked}
     >
       <Text tag="span">
-        {from}{' '}
+        {`${capitalize(from)} `}
         <TextTransition inline springConfig={presets.wobbly}>
           {checked ? 'paid' : 'owes'}
-        </TextTransition>{' '}
-        {to} <span className="font-bold">{amount}</span> {currency}
+        </TextTransition>
+        {` ${capitalize(to)}`} <span className="font-bold">{amount}</span> {currency}
       </Text>
     </div>
   )
