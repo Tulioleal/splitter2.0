@@ -1,11 +1,9 @@
 import { useTabStore } from '@/store/store'
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '../ui/table'
-import Expense from './Expense'
 import { useShallow } from 'zustand/shallow'
 import { useMemo } from 'react'
 import { getCleanSet } from '@/lib/getCleanSet'
-
-//TODO: Add mod and delete functionality to each expense
+import EditableExpenseRow from './Expense.row'
 
 const ExpenseTable = () => {
   const { expenses, currency } = useTabStore(
@@ -26,20 +24,19 @@ const ExpenseTable = () => {
   }, [expenses])
 
   return (
-    <Table className="overflow-y-scroll max-h-10 bg-gray-200">
+    <Table className="bg-gray-200">
       <TableCaption>List of all the expenses</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead className="text-center">Expense</TableHead>
           <TableHead className="text-center">Between</TableHead>
           <TableHead className="text-center">Amount</TableHead>
+          <TableHead className="text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="overflow-y-auto max-h-[300px]">
         {expenses.map((expense, key) => (
-          <TableRow key={key}>
-            <Expense {...expense} />
-          </TableRow>
+          <EditableExpenseRow key={key} {...expense} />
         ))}
       </TableBody>
       <TableFooter>
@@ -49,6 +46,7 @@ const ExpenseTable = () => {
           <TableCell className="font-bold text-center">
             {getTotal.toFixed(2)} {`${currency}`}
           </TableCell>
+          <TableCell />
         </TableRow>
         <TableRow>
           <TableCell className="font-bold text-center">Total each</TableCell>
@@ -56,6 +54,7 @@ const ExpenseTable = () => {
           <TableCell className="font-bold text-center">
             {(getTotal / getTotalPeople).toFixed(2)} {`${currency}`}
           </TableCell>
+          <TableCell />
         </TableRow>
       </TableFooter>
     </Table>

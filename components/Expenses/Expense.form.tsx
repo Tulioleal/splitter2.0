@@ -13,13 +13,13 @@ import { Button } from '../ui/button'
 type ExpenseForm = z.infer<typeof expenseSchema>
 
 const ExpenseForm = () => {
-  const { expenses, modTab, toggleExpensesTouched } = useTabStore(
+  const { expenses, modTab, setExpensesTouched } = useTabStore(
     useShallow((state) => ({
       expenses: state.tab.expenses,
       currency: state.tab.currency,
       closed: state.tab.closed,
       modTab: state.modTab,
-      toggleExpensesTouched: state.toggleExpensesTouched
+      setExpensesTouched: state.setExpensesTouched
     }))
   )
   const {
@@ -62,7 +62,7 @@ const ExpenseForm = () => {
       expenses: [...(expenses || []), getObjectWithBasic(data)],
       closed: false
     })
-    toggleExpensesTouched()
+    setExpensesTouched(true)
     reset()
   }
 

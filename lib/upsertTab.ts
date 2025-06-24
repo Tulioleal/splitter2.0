@@ -4,7 +4,7 @@ import db from "@/db/db"
 import { useTabStore } from "@/store/store"
 
 export default async function upsertTab(tab: Tab) {
-  if (tab.id == '') {
+  if (tab.id === '') {
     const completeTab = getObjectWithBasic({
       ...tab,
       isNew: true
@@ -22,7 +22,7 @@ export default async function upsertTab(tab: Tab) {
     }
   }
 
-  if (tab.id != '') {
+  if (tab.id !== '') {
     db.tab.put(getObjectWithBasic(tab)).catch((error) => {
       console.error('Error updating tab:', error)
     })

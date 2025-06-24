@@ -7,22 +7,23 @@ import { useTabStore } from '@/store/store'
 import { useShallow } from 'zustand/react/shallow'
 
 const Transactions = () => {
-  const { actions, expenses, modTab, expensesTouched } = useTabStore(
+  const { actions, expenses, modTab, expensesTouched, setExpensesTouched } = useTabStore(
     useShallow((state) => ({
       actions: state.tab.actions,
       expenses: state.tab.expenses,
       modTab: state.modTab,
-      expensesTouched: state.ExpensesTouched
+      expensesTouched: state.expensesTouched,
+      setExpensesTouched: state.setExpensesTouched
     }))
   )
   const fetchActions = async () => {
-    console.log(!expensesTouched, actions.length > 0)
     return Boolean(actions.length > 0) && !expensesTouched
       ? await Promise.resolve(actions || [])
-      : fetchFromAPI<Action[]>({ expenses: expenses }, 'actions', 'POST').then((data) => {
+      : await fetchFromAPI<Action[]>({ expenses: expenses }, 'actions', 'POST').then((data) => {
           modTab({
             actions: data
           })
+          setExpensesTouched(false)
           return data
         })
   }

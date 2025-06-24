@@ -68,7 +68,6 @@ const TabScreenContent = () => {
 
 const TabScreen = ({ id }: { id?: string }) => {
   const { isLoading } = useQuery({ queryKey: [id], queryFn: fetchTab.bind(null, id) })
-  const modTab = useTabStore((state) => state.modTab)
   useEffect(() => {
     const sub = useTabStore.subscribe(
       (state) => state.tab,
@@ -80,7 +79,7 @@ const TabScreen = ({ id }: { id?: string }) => {
     )
 
     return sub
-  }, [modTab])
+  }, [])
 
   if (isLoading) {
     return (
