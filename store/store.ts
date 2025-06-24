@@ -5,8 +5,8 @@ import { Tab } from "@/types/Tab";
 
 interface TabStore {
   tab: Tab
-  ExpensesTouched: boolean,
-  toggleExpensesTouched: () => void,
+  expensesTouched: boolean,
+  setExpensesTouched: (value: boolean) => void,
   modTab: (tab: Partial<Tab>) => void,
   resetTab: () => void
 }
@@ -26,9 +26,9 @@ const initialState: Tab = {
 
 export const useTabStore = create<TabStore>()(subscribeWithSelector((set) => ({
   tab: initialState,
-  ExpensesTouched: false,
-  toggleExpensesTouched: () => set((state) => ({
-    ExpensesTouched: !state.ExpensesTouched,
+  expensesTouched: false,
+  setExpensesTouched: (value: boolean) => set(() => ({
+    expensesTouched: value,
   })),
   modTab: (partialTab: Partial<Tab>) => set((state) => ({
     tab: {
