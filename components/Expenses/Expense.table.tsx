@@ -2,8 +2,8 @@ import { useTabStore } from '@/store/store'
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '../ui/table'
 import { useShallow } from 'zustand/shallow'
 import { useMemo } from 'react'
-import { getCleanSet } from '@/lib/getCleanSet'
 import EditableExpenseRow from './Expense.row'
+import { normalizeUsers } from '@/lib/normalizeUsers'
 
 const ExpenseTable = () => {
   const { expenses, currency } = useTabStore(
@@ -19,7 +19,7 @@ const ExpenseTable = () => {
 
   const getTotalPeople = useMemo((): number => {
     if (!expenses) return 0
-    const cleanNames = getCleanSet(expenses.flatMap((expense) => expense.splitBetween))
+    const cleanNames = normalizeUsers(expenses)
     return cleanNames.length || 1 // Ensure at least one person to avoid division by zero
   }, [expenses])
 
