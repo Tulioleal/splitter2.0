@@ -7,7 +7,7 @@ import { Skeleton } from './ui/skeleton'
 
 const TabList = () => {
   const tabs = useLiveQuery(() => db.tab.toArray())
-  if (!tabs)
+  if (!tabs) {
     return (
       <div className="flex flex-col gap-1.5 w-[320px] sm:w-[600px]">
         {Array.from({ length: 5 }).map((_, index) => (
@@ -15,6 +15,22 @@ const TabList = () => {
         ))}
       </div>
     )
+  }
+
+  if (tabs.length === 0) {
+    return (
+      <div className="w-[320px] sm:w-[600px] text-center ">
+        <b>
+          <p className="text-gray-500">
+            No tabs found.{' '}
+            <Link href="/tab">
+              <span className="text-blue-400 hover:underline">Start a new tab!</span>
+            </Link>
+          </p>
+        </b>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-1.5 max-h-[400px] overflow-y-auto w-[320px] xs:w-[250px] sm:w-[600px]">
