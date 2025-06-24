@@ -7,14 +7,17 @@ type TextProps = React.HTMLProps<HTMLParagraphElement> & {
 const Text = ({ tag = 'p', children, className, ...props }: TextProps): JSX.Element => {
   if (tag === 'span') {
     return (
-      <span className={`text-sm text-muted-foreground sm:text-base md:text-lg lg:text-xl ${className}`} {...props}>
+      <span
+        className={`leading-7 [&:not(:first-child)]:mt-6 sm:text-base md:text-lg lg:text-xl ${className}`}
+        {...props}
+      >
         {children}
       </span>
     )
   }
 
   return (
-    <p className={`text-sm text-muted-foreground sm:text-base md:text-lg lg:text-xl ${className}`} {...props}>
+    <p className={`leading-7 [&:not(:first-child)]:mt-6 sm:text-base md:text-lg lg:text-xl ${className}`} {...props}>
       {' '}
       {children}
     </p>
