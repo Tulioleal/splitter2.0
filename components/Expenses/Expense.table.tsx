@@ -5,8 +5,6 @@ import { useMemo } from 'react'
 import { getCleanSet } from '@/lib/getCleanSet'
 import EditableExpenseRow from './Expense.row'
 
-//TODO: Add mod and delete functionality to each expense
-
 const ExpenseTable = () => {
   const { expenses, currency } = useTabStore(
     useShallow((state) => ({
