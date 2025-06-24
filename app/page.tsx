@@ -11,9 +11,11 @@ export default function Home() {
       <Heading>Welcome to Splitter</Heading>
       <Text>A simple straightforward way to split bills with friends and family.</Text>
       <div className="mt-8">
-        <Button variant="default" size="lg">
-          <Link href="/tab">Open a new Tab</Link>
-        </Button>
+        <Link href="/tab">
+          <Button variant="default" size="lg">
+            Open a new Tab
+          </Button>
+        </Link>
       </div>
 
       <div className="mt-4">
