@@ -60,7 +60,7 @@ const TabScreenContent = () => {
   const Step = useMemo(() => STEPS[currentStep], [currentStep, STEPS])
 
   return (
-    <div className="flex flex-col gap-4 w-[400px] sm:min-w-[640px]">
+    <div className="flex flex-col gap-4 w-full max-w-[400px] sm:max-w-[640px]">
       <Stepper steps={STEPS} currentStep={currentStep} onStepChange={setCurrentStep} {...Step}>
         <Step.component />
       </Stepper>
