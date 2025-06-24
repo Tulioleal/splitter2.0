@@ -37,9 +37,15 @@ const Transactions = () => {
   if (isLoading) return <Spinner size="md" />
   if (error || !data) return <div>Error: {error?.message}</div>
 
+  if (data.length === 0) {
+    return <div className="text-center text-gray-500">Looks like everything is even! No transactions to show!</div>
+  }
+
   return (
     <div className="flex flex-col gap-4 py-4 rounded-lg max-h-[calc(100vh-200px)] overflow-y-auto">
-      {actions?.map((action) => <Transaction key={action.id} {...action} />)}
+      {actions.map((action) => (
+        <Transaction key={action.id} {...action} />
+      ))}
     </div>
   )
 }

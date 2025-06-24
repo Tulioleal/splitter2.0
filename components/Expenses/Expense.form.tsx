@@ -67,7 +67,7 @@ const ExpenseForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-y-4 md:grid-cols-4 sm:gap-x-4">
       <Input
         {...register('name', { required: true })}
         type="text"

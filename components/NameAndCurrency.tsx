@@ -35,15 +35,10 @@ const NameAndCurrencyForm = () => {
   }, [name, currency])
 
   return (
-    <form className="flex flex-row gap-4 justify-between">
-      <Input
-        className="min-w-100"
-        placeholder="Name for the Tab"
-        defaultValue={name}
-        onChange={(e) => setValue(e.target.value, 'name')}
-      />
+    <form className="flex flex-col gap-4 justify-between sm:flex-row">
+      <Input placeholder="Name for the Tab" defaultValue={name} onChange={(e) => setValue(e.target.value, 'name')} />
       <Select defaultValue={currency} onValueChange={(value) => setValue(value, 'currency')}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-full sm:w-[180px]">
           <SelectValue placeholder="" />
         </SelectTrigger>
         <SelectContent>

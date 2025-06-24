@@ -2,6 +2,7 @@ import { Action } from "@/types/Action";
 import { ExpenseOBC } from "@/types/Expense";
 import getObjectWithBasic from "./getObjectWithBasic";
 import { getCleanSet } from "./getCleanSet";
+import { normalizeUsers } from "./normalizeUsers";
 
 /**
  * Calculates the optimal money transfer actions to settle expenses between multiple people.
@@ -35,24 +36,20 @@ import { getCleanSet } from "./getCleanSet";
 export function getActions(expenses: ExpenseOBC[]): Action[] {
   const balances: Record<string, number> = {};
   const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0);
-  const totalPeople = getCleanSet(
-    expenses.flatMap((expense) => expense.splitBetween)
-  ).length || 1; // Ensure at least one person to avoid division by zero
+  const totalPeople = normalizeUsers(expenses).length || 1; // Ensure at least one person to avoid division by zero
   const averageExpense = totalExpenses / totalPeople;
 
   for (const expense of expenses) {
     const { amount, splitBetween } = expense;
-    const cleanSplitBetween = getCleanSet(splitBetween);
+    const cleanSplitBetween = getCleanSet(splitBetween.map(person => person.toLowerCase()));
     const share = amount / cleanSplitBetween.length;
 
     for (const person of cleanSplitBetween) {
-      const lowerCasePerson = person.toLowerCase();
-
-      if (balances[lowerCasePerson] == undefined) {
-        balances[lowerCasePerson] = 0;
+      if (balances[person] == undefined) {
+        balances[person] = 0;
       }
 
-      balances[lowerCasePerson] = share + balances[lowerCasePerson];
+      balances[person] = share + balances[person];
     }
   }
 

@@ -4,7 +4,7 @@ import Expenses from '@/components/Expenses/Expenses'
 import NameAndCurrency from '@/components/NameAndCurrency'
 import Transactions from '@/components/Transactions/Transactions'
 import Heading from '@/components/ui/heading'
-import { Stepper } from '@/components/ui/stepper'
+import Stepper from '@/components/ui/stepper'
 import { tabSchema } from '@/schemas/Tab.schema'
 import { useTabStore } from '@/store/store'
 import { JSX, useEffect, useMemo, useState } from 'react'
@@ -42,7 +42,9 @@ const TabScreenContent = () => {
       {
         title: 'Even Things Out',
         component: Transactions,
-        canMoveForward: Boolean(tab.actions.length > 0 && tab.actions.every((action) => action.checked)),
+        canMoveForward: Boolean(
+          tab.actions.length === 0 || (tab.actions.length > 0 && tab.actions.every((action) => action.checked))
+        ),
         onNextSideEffect: () => {
           upsertTab({ ...tab, closed: true })
             .then(() => router.push(`/`))
@@ -58,7 +60,7 @@ const TabScreenContent = () => {
   const Step = useMemo(() => STEPS[currentStep], [currentStep, STEPS])
 
   return (
-    <div className="flex flex-col gap-4 min-w-[720px]">
+    <div className="flex flex-col gap-4 w-full max-w-[400px] sm:max-w-[640px]">
       <Stepper steps={STEPS} currentStep={currentStep} onStepChange={setCurrentStep} {...Step}>
         <Step.component />
       </Stepper>
