@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Splitter
+
+A simple straightforward way to split bills with friends and family.
+
+## Features
+
+*   Create new tabs to manage shared expenses.
+*   Define tab name and currency.
+*   Add expenses to a tab, specifying:
+    *   Expense name
+    *   Who paid
+    *   Amount
+    *   Number of people to split the expense between.
 
 ## Getting Started
 
-First, run the development server:
+To get a local copy up and running, follow these simple steps.
+
+### Prerequisites
+
+*   Node.js (version 20 or later recommended)
+*   npm (comes with Node.js)
+
+### Installation
+
+1.  Clone the repo:
+    ```bash
+    git clone https://github.com/your_username/your_project_name.git
+    ```
+    *Replace `your_username/your_project_name.git` with the actual URL of the repository.*
+2.  Navigate to the project directory:
+    ```bash
+    cd your_project_name
+    ```
+3.  Install NPM packages:
+    ```bash
+    npm install
+    ```
+
+### Running the Development Server
+
+To start the development server, run:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This will typically start the application on `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Building for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To build the application for production, use:
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+And to start the production server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech Stack
 
-## Deploy on Vercel
+*   **Framework:** [Next.js](https://nextjs.org/)
+*   **Language:** [TypeScript](https://www.typescriptlang.org/)
+*   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+*   **UI Components:** Radix UI (based on `package.json` dependencies like `@radix-ui/react-label`)
+*   **Form Handling:** React Hook Form (based on `package.json` dependencies)
+*   **Schema Validation:** Zod (based on `package.json` dependencies)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contributing
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request

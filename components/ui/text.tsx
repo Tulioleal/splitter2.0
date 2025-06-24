@@ -1,15 +1,27 @@
-import { JSX } from "react";
+import { JSX } from 'react'
 
-type TextProps = React.HTMLProps<HTMLParagraphElement>
-
-const Text = ({children, ...props}:TextProps):JSX.Element => {
-  return (
-    <p
-      className="text-4xl font-bold text-gray-800"
-      {...props}
-    > {children}
-    </p>
-  );
+type TextProps = React.HTMLProps<HTMLParagraphElement> & {
+  tag?: 'span' | 'p'
 }
 
-export default Text;
+const Text = ({ tag = 'p', children, className, ...props }: TextProps): JSX.Element => {
+  if (tag === 'span') {
+    return (
+      <span
+        className={`leading-7 [&:not(:first-child)]:mt-6 sm:text-base md:text-lg lg:text-xl ${className}`}
+        {...props}
+      >
+        {children}
+      </span>
+    )
+  }
+
+  return (
+    <p className={`leading-7 [&:not(:first-child)]:mt-6 sm:text-base md:text-lg lg:text-xl ${className}`} {...props}>
+      {' '}
+      {children}
+    </p>
+  )
+}
+
+export default Text
