@@ -1,9 +1,9 @@
 import { useTabStore } from '@/store/store'
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '../ui/table'
-import Expense from './Expense'
 import { useShallow } from 'zustand/shallow'
 import { useMemo } from 'react'
 import { getCleanSet } from '@/lib/getCleanSet'
+import EditableExpenseRow from './Expense.row'
 
 //TODO: Add mod and delete functionality to each expense
 
@@ -38,9 +38,7 @@ const ExpenseTable = () => {
       </TableHeader>
       <TableBody className="overflow-y-auto max-h-[300px]">
         {expenses.map((expense, key) => (
-          <TableRow key={key}>
-            <Expense {...expense} />
-          </TableRow>
+          <EditableExpenseRow key={key} {...expense} />
         ))}
       </TableBody>
       <TableFooter>
