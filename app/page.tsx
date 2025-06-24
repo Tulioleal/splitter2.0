@@ -8,8 +8,8 @@ import Link from 'next/link'
 export default function Home() {
   return (
     <>
-      <Heading>Welcome to Splitter</Heading>
-      <Text>A simple straightforward way to split bills with friends and family.</Text>
+      <Heading className="sm:text-3xl">Welcome to Splitter</Heading>
+      <Text className="text-center">A simple straightforward way to split bills with friends and family.</Text>
       <div className="mt-8">
         <Link href="/tab">
           <Button variant="default" size="lg">
