@@ -42,7 +42,7 @@ const Transactions = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 py-4 rounded-lg max-h-[calc(100vh-200px)] overflow-y-auto">
+    <div className="flex flex-col gap-4 py-4 rounded-lg max-h-[calc(60vh)] overflow-y-auto">
       {actions.map((action) => (
         <Transaction key={action.id} {...action} />
       ))}
